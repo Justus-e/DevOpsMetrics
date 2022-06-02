@@ -1,0 +1,36 @@
+{
+  "name": "devopsmetrics",
+  "version": "1.0.0",
+  "description": "A tool to calculate the four DORA metrics",
+  "main": "src/app.ts",
+  "scripts": {
+    "dev": "nodemon src/app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Justus-e/DevOpsMetrics.git"
+  },
+  "keywords": [
+    "DORA",
+    "Metrics",
+    "DevOps",
+    "four",
+    "keys"
+  ],
+  "author": "Justus Ernst",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Justus-e/DevOpsMetrics/issues"
+  },
+  "homepage": "https://github.com/Justus-e/DevOpsMetrics#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.1",
+    "swagger-jsdoc": "^6.2.1",
+    "swagger-ui-express": "^4.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  }
+}
