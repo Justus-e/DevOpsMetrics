@@ -7,21 +7,19 @@ const options = {
     definition: {
         openapi: "3.0.0",
         info: {
-            title: "Stammbaum Rest-Api",
+            title: "DevOpsMetrics API",
             version: "1.0.0",
             description:
-                "This is a Rest-Api for stammbaum-app",
+                "This API is collecting events via the /events endpoint and will calculate the four DORA metrics from them.",
             contact: {
-                name: "Mindestdöner",
-                url: "https://github.com/MindestDoener",
+                name: "Justus Ernst",
+                url: "https://github.com/justus-e",
+                email: "justernst.je+devopsmetrics@gmail.com"
             },
         },
         servers: [
             {
                 url: "http://localhost:3000/api/",
-            },
-            {
-                url: "https://stammbaum-rest-api.herokuapp.com/api/"
             },
         ],
         security: [
@@ -44,7 +42,7 @@ const options = {
 
 const specs = swaggerJsdoc(options);
 router.use(
-    "/api-docs",
+    "/swagger",
     swaggerUi.serve,
     swaggerUi.setup(specs)
 );
