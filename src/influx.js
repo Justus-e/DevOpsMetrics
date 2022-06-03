@@ -11,9 +11,10 @@ const {Point} = require('@influxdata/influxdb-client')
 const writeApi = client.getWriteApi(org, bucket)
 const queryApi = client.getQueryApi(org)
 
-const writeDeployEvent = () => {
-    const point = new Point('deployment').booleanField('success',true)
+const writeEvent = (eventType) => {
+    const point = new Point(eventType).booleanField('success',true)
     writeApi.writePoint(point)
+    flush()
 }
 
 const queryDeployEvents = () => {
@@ -47,4 +48,4 @@ const flush = () => {
         })
 }
 
-module.exports = {writeDeployEvent, flush, queryDeployEvents}
+module.exports = {writeEvent, flush, queryDeployEvents}

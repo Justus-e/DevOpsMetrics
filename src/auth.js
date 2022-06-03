@@ -3,7 +3,7 @@ const checkApiKey = () => (req, res, next) => {
         return key === process.env.API_KEY
     }
 
-    if (!isValid(req.header('X-API-Key'))) {
+    if (!isValid(req.header('X-API-KEY'))) {
         return res.status(401).json({status: 'Unauthorized'});
     }
     next();

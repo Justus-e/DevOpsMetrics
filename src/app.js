@@ -3,7 +3,6 @@ require('dotenv').config()
 const express = require('express');
 const cors = require('cors');
 const auth = require('./auth');
-const influx = require('./influx')
 
 
 const app = express();
@@ -23,11 +22,7 @@ app.get('/', (_req, res) => {
 });
 app.use(require(ENDPOINT + 'swagger'));
 
-influx.writeDeployEvent()
-
-influx.flush()
-
-influx.queryDeployEvents()
+app.use('/api', require(ENDPOINT + 'events'))
 
 //----------------------------------------------------------------------------------------------------------------------
 
