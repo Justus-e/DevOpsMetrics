@@ -12,33 +12,27 @@ const writeApi = client.getWriteApi(org, bucket)
 const queryApi = client.getQueryApi(org)
 
 const writeEvent = (eventType) => {
-    const point = new Point(eventType).booleanField('success',true)
+    const point = new Point(eventType).booleanField('success', true)
     writeApi.writePoint(point)
     flush()
 }
 
-const queryDeployEvents = () => {
+const queryEvents = (eventType, range) => {
 
-    const query = `from(bucket: "events") |> range(start: -1h)`
-    queryApi.queryRows(query, {
-        next(row, tableMeta) {
-            const o = tableMeta.toObject(row)
-            console.log(`${o._time} ${o._measurement}: ${o._field}=${o._value}`)
-        },
-        error(error) {
+    const query = `from(bucket: "${bucket}") |> range(start: ${range}) |> filter(fn: (r) => r._measurement == "${eventType}")`
+
+    return queryApi
+        .collectRows(query)
+        .catch(error => {
             console.error(error)
-            console.log('Finished ERROR')
-        },
-        complete() {
-            console.log('Finished SUCCESS')
-        },
-    })
+            console.log('\nCollect ROWS ERROR')
+        })
 
 }
 
 const flush = () => {
     writeApi
-        .close()
+        .flush()
         .then(() => {
             console.log('FINISHED')
         })
@@ -48,4 +42,4 @@ const flush = () => {
         })
 }
 
-module.exports = {writeEvent, flush, queryDeployEvents}
+module.exports = {writeEvent, flush, queryEvents}

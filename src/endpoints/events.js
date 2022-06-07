@@ -12,7 +12,7 @@ const influx = require('../influx')
  *                  eventType:
  *                      type: string
  *                      required: true
- *                      description: type of event ('deployment', 'change', 'incident', 'restore')
+ *                      description: type of event ('deployment' | 'change' | 'incident' | 'restore')
  */
 
 /**
@@ -38,26 +38,32 @@ const influx = require('../influx')
  *          200:
  *              description: 'Event successfully added'
  */
-router.post('/events', async (req, res) => {
+router.post('/events', (req, res) => {
     try {
         const {eventType} = req.body;
         switch (eventType) {
+        //     case "deployment":
+        //         influx.writeEvent('deployment');
+        //         break;
+        //     case "change":
+        //         influx.writeEvent('change');
+        //         break;
+        //     case "incident":
+        //         influx.writeEvent('incident');
+        //         break;
+        //     case "restore":
+        //         influx.writeEvent('restore');
+        //         break;
             case "deployment":
-                influx.writeEvent('deployment');
-                break;
             case "change":
-                influx.writeEvent('change');
-                break;
             case "incident":
-                influx.writeEvent('incident');
-                break;
             case "restore":
-                influx.writeEvent('restore');
+                influx.writeEvent(eventType);
                 break;
             default:
                 res.status(400).send('unknown eventType')
         }
-        res.status(200).send("Event added!");
+        res.status(200).send(`Event of type '${eventType}' added!`);
     } catch (err) {
         console.error(err);
         res.sendStatus(500);
