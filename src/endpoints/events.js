@@ -40,11 +40,11 @@ const influx = require('../influx')
  */
 router.post('/events', (req, res) => {
     try {
-        const {eventType} = req.body;
+        const {eventType, payload} = req.body;
         switch (eventType) {
-        //     case "deployment":
-        //         influx.writeEvent('deployment');
-        //         break;
+            case "deployment":
+                influx.writeDeploymentEvent(payload);
+                break;
         //     case "change":
         //         influx.writeEvent('change');
         //         break;
@@ -54,7 +54,6 @@ router.post('/events', (req, res) => {
         //     case "restore":
         //         influx.writeEvent('restore');
         //         break;
-            case "deployment":
             case "change":
             case "incident":
             case "restore":
