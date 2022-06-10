@@ -64,4 +64,4 @@ const flush = () => {
         })
 }
 
-module.exports = {writeDeploymentEvent, flush, queryEvents}
+module.exports = {writeDeploymentEvent, writeChangeEvent, writeIncidentEvent, writeRestoreEvent, flush, queryEvents}

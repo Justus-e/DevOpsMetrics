@@ -13,6 +13,9 @@ const influx = require('../influx')
  *                      type: string
  *                      required: true
  *                      description: type of event ('deployment' | 'change' | 'incident' | 'restore')
+ *                  payload:
+ *                      type: object
+ *                      description: payload specific to the Event
  */
 
 /**
@@ -45,19 +48,14 @@ router.post('/events', (req, res) => {
             case "deployment":
                 influx.writeDeploymentEvent(payload);
                 break;
-        //     case "change":
-        //         influx.writeEvent('change');
-        //         break;
-        //     case "incident":
-        //         influx.writeEvent('incident');
-        //         break;
-        //     case "restore":
-        //         influx.writeEvent('restore');
-        //         break;
             case "change":
+                influx.writeChangeEvent();
+                break;
             case "incident":
+                influx.writeIncidentEvent();
+                break;
             case "restore":
-                influx.writeEvent(eventType);
+                influx.writeRestoreEvent();
                 break;
             default:
                 res.status(400).send('unknown eventType')
