@@ -14,17 +14,20 @@ const options = {
             contact: {
                 name: "Justus Ernst",
                 url: "https://github.com/justus-e",
-                email: "justernst.je+devopsmetrics@gmail.com"
+                email: "justernst.je+devopsmetrics@gmail.com",
             },
         },
         servers: [
             {
                 url: "http://localhost:8080/api/",
             },
+            {
+                url: "https://dev-ops-metrics.herokuapp.com/api/",
+            },
         ],
         security: [
             {
-                ApiKeyAuth: []
+                ApiKeyAuth: [],
             }
         ],
         components: {
@@ -32,7 +35,7 @@ const options = {
                 ApiKeyAuth: {
                     type: "apiKey",
                     in: "header",
-                    name: "X-API-KEY"
+                    name: "X-API-KEY",
                 }
             }
         }
