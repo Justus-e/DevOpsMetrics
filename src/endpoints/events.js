@@ -1,6 +1,6 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const influx = require('../influx')
+const influx = require("../influx");
 
 /** Event MODEL
  * @swagger
@@ -41,30 +41,30 @@ const influx = require('../influx')
  *          200:
  *              description: 'Event successfully added'
  */
-router.post('/events', (req, res) => {
-    try {
-        const {eventType, payload} = req.body;
-        switch (eventType) {
-            case "deployment":
-                influx.writeDeploymentEvent(payload);
-                break;
-            case "change":
-                influx.writeChangeEvent();
-                break;
-            case "incident":
-                influx.writeIncidentEvent();
-                break;
-            case "restore":
-                influx.writeRestoreEvent();
-                break;
-            default:
-                res.status(400).send('unknown eventType')
-        }
-        res.status(200).send(`Event of type '${eventType}' added!`);
-    } catch (err) {
-        console.error(err);
-        res.sendStatus(500);
+router.post("/events", (req, res) => {
+  try {
+    const { eventType, payload } = req.body;
+    switch (eventType) {
+      case "deployment":
+        influx.writeDeploymentEvent(payload);
+        break;
+      case "change":
+        influx.writeChangeEvent();
+        break;
+      case "incident":
+        influx.writeIncidentEvent();
+        break;
+      case "restore":
+        influx.writeRestoreEvent();
+        break;
+      default:
+        res.status(400).send("unknown eventType");
     }
+    res.status(200).send(`Event of type '${eventType}' added!`);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
 });
 
 module.exports = router;

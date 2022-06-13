@@ -34,6 +34,7 @@
     "swagger-ui-express": "^4.4.0"
   },
   "devDependencies": {
-    "nodemon": "2.0.16"
+    "nodemon": "2.0.16",
+    "prettier": "^2.6.2"
   }
 }
