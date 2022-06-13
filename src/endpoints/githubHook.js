@@ -18,8 +18,8 @@ const evaluateEvent = (eventType, payload) => {
   switch (eventType) {
     case "push":
       return evaluatePushEvent(payload);
-    case "deployment":
-      return evaluateDeploymentEvent(payload);
+    case "deployment_status":
+      return evaluateDeploymentStatusEvent(payload);
     case "issue":
       return evaluateIssueEvent(payload);
     default:
@@ -32,6 +32,7 @@ const evaluatePushEvent = (payload) => {
   for (const commit of commits) {
     influx.writeChangeEvent({
       pushSha: payload.after,
+      ref: payload.ref,
       id: commit.id,
       timestamp: commit.timestamp,
     });
@@ -39,15 +40,16 @@ const evaluatePushEvent = (payload) => {
   influx.flush();
 };
 
-const evaluateDeploymentEvent = (payload) => {
-  influx.writeDeploymentEvent({
-    sha: payload.deployment.sha,
-    timestamp: payload.deployment.created_at,
-  });
+const evaluateDeploymentStatusEvent = (payload) => {
+  if (payload.deployment_status.state === "success")
+    influx.writeDeploymentEvent({
+      sha: payload.deployment.sha,
+      timestamp: payload.deployment.updated_at,
+    });
 };
 
 const evaluateIssueEvent = (payload) => {
-  //TODO: implement test test bla bla
+  //TODO: implement
 };
 
 module.exports = router;

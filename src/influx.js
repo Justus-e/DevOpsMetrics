@@ -25,6 +25,7 @@ const writeChangeEvent = (change) => {
   const point = new Point("change")
     .stringField("pushSha", change.pushSha)
     .stringField("id", change.id)
+    .stringField("ref", change.ref)
     .timestamp(new Date(change.timestamp));
   writeApi.writePoint(point);
 };
