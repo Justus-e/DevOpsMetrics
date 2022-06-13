@@ -24,6 +24,7 @@ app.use(require(ENDPOINT + 'swagger'));
 
 app.use('/api', require(ENDPOINT + 'events'))
 app.use('/api', require(ENDPOINT + 'metrics'))
+app.use('/api', require(ENDPOINT + 'githubHook'))
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -1,12 +1,24 @@
-const checkApiKey = () => (req, res, next) => {
-    const isValid = (key) => {
-        return key === process.env.API_KEY
+const crypto = require("crypto")
+
+const authenticate = () => (req, res, next) => {
+    if (req.header('X-API-KEY') !== process.env.API_KEY && !req.header("X-Hub-Signature-256")) {
+        return res.sendStatus(401);
     }
 
-    if (!isValid(req.header('X-API-KEY'))) {
-        return res.status(401).json({status: 'Unauthorized'});
+    const githubSignature = req.header("X-Hub-Signature-256")
+    if (!!githubSignature) {
+        const expectedSignature = 'sha256=' +
+            crypto
+                .createHmac("sha256", process.env.API_KEY)
+                .update(JSON.stringify(req.body))
+                .digest("hex");
+
+        if (githubSignature !== expectedSignature) {
+            return res.status(401).send("Signature not matching");
+        }
     }
+
     next();
 };
 
-module.exports = checkApiKey;
+module.exports = authenticate;
