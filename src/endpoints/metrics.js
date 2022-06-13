@@ -1,6 +1,6 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const deploymentFrequency = require('../metrics/deploymentFrequency')
+const deploymentFrequency = require("../metrics/deploymentFrequency");
 
 /** Metrics MODEL
  * @swagger
@@ -44,19 +44,19 @@ const deploymentFrequency = require('../metrics/deploymentFrequency')
  *                      schema:
  *                          $ref: '#/components/schemas/Metrics'
  */
-router.get('/metrics', async (_req, res) => {
-    try {
-        const metrics = {
-            deploymentFrequency: await deploymentFrequency.getMetric(),
-            leadTime: 0,
-            changeFailRate: 0,
-            timeToRecovery: 0
-        }
-        res.status(200).json(metrics);
-    } catch (err) {
-        console.error(err);
-        res.sendStatus(500);
-    }
+router.get("/metrics", async (_req, res) => {
+  try {
+    const metrics = {
+      deploymentFrequency: await deploymentFrequency.getMetric(),
+      leadTime: 0,
+      changeFailRate: 0,
+      timeToRecovery: 0,
+    };
+    res.status(200).json(metrics);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
 });
 
 module.exports = router;
