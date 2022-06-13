@@ -47,7 +47,7 @@ const evaluateDeploymentEvent = (payload) => {
 };
 
 const evaluateIssueEvent = (payload) => {
-  //TODO: implement test test
+  //TODO: implement test test bla bla
 };
 
 module.exports = router;
