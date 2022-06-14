@@ -51,7 +51,7 @@ const evaluateDeploymentStatusEvent = (payload) => {
 };
 
 const evaluateIssueEvent = (payload) => {
-  //TODO: implement
+  //TODO: implement test test test test test
 };
 
 const evaluatePullRequestEvent = (payload) => {
