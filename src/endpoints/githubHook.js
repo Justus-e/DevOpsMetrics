@@ -52,7 +52,7 @@ const evaluateDeploymentStatusEvent = (payload) => {
 };
 
 const evaluateIssueEvent = (payload) => {
-  //TODO: implement test test test test test
+  //TODO: implement
 };
 
 const evaluatePullRequestEvent = (payload) => {
