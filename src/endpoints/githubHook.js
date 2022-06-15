@@ -31,6 +31,7 @@ const evaluateEvent = (eventType, payload) => {
 
 const evaluatePushEvent = (payload) => {
   const commits = payload.commits;
+  console.log(commits.length);
   for (const commit of commits) {
     influx.writeChangeEvent({
       pushSha: payload.after,
