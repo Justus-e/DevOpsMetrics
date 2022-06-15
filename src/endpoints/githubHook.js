@@ -22,8 +22,6 @@ const evaluateEvent = (eventType, payload) => {
       return evaluateDeploymentStatusEvent(payload);
     case "issue":
       return evaluateIssueEvent(payload);
-    case "pull_request":
-      return evaluatePullRequestEvent(payload);
     default:
       throw new Error("unknown type of event");
   }
@@ -52,10 +50,6 @@ const evaluateDeploymentStatusEvent = (payload) => {
 };
 
 const evaluateIssueEvent = (payload) => {
-  //TODO: implement
-};
-
-const evaluatePullRequestEvent = (payload) => {
   //TODO: implement
 };
 
