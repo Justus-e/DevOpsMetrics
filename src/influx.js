@@ -14,29 +14,40 @@ const queryApi = client.getQueryApi(org);
 
 const writeDeploymentEvent = (deployment) => {
   const point = new Point("deployment")
-    .stringField("sha", deployment.sha)
+    .stringField("id", deployment.sha)
+    .tag("repo", deployment.repo)
     .timestamp(new Date(deployment.timestamp));
 
   writeApi.writePoint(point);
   flush();
 };
 
+/*
+ * use flush() after this function
+ */
 const writeChangeEvent = (change) => {
   const point = new Point("change")
     .stringField("pushSha", change.pushSha)
     .stringField("id", change.id)
-    .stringField("ref", change.ref)
+    .tag("ref", change.ref)
+    .tag("repo", change.repo)
     .timestamp(new Date(change.timestamp));
   writeApi.writePoint(point);
 };
 
-const writeIncidentEvent = () => {
-  const point = new Point("incident").booleanField("success", true);
+const writeIncidentEvent = (incident) => {
+  const point = new Point("incident")
+    .stringField("id", incident.id)
+    .tag("repo", incident.repo)
+    .timestamp(new Date(incident.timestamp));
   writeApi.writePoint(point);
   flush();
 };
-const writeRestoreEvent = () => {
-  const point = new Point("restore").booleanField("success", true);
+const writeRestoreEvent = (restore) => {
+  const point = new Point("restore")
+    .stringField("id", restore.id)
+    .tag("repo", restore.repo)
+    .timestamp(new Date(restore.timestamp));
   writeApi.writePoint(point);
   flush();
 };
@@ -46,20 +57,13 @@ const queryEvents = (eventType, range) => {
 
   return queryApi.collectRows(query).catch((error) => {
     console.error(error);
-    console.log("\nCollect ROWS ERROR");
   });
 };
 
 const flush = () => {
-  writeApi
-    .flush()
-    .then(() => {
-      console.log("FINISHED");
-    })
-    .catch((e) => {
-      console.error(e);
-      console.log("Finished ERROR");
-    });
+  writeApi.flush().catch((e) => {
+    console.error(e);
+  });
 };
 
 module.exports = {

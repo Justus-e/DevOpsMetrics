@@ -20,8 +20,8 @@ const evaluateEvent = (eventType, payload) => {
       return evaluatePushEvent(payload);
     case "deployment_status":
       return evaluateDeploymentStatusEvent(payload);
-    case "issue":
-      return evaluateIssueEvent(payload);
+    case "issues":
+      return evaluateIssuesEvent(payload);
     default:
       throw new Error("unknown type of event");
   }
@@ -32,10 +32,11 @@ const evaluatePushEvent = (payload) => {
   console.log(commits.length);
   for (const commit of commits) {
     influx.writeChangeEvent({
-      pushSha: payload.after,
+      pushSha: payload.after, // todo: maybe not necessary
       ref: payload.ref,
       id: commit.id,
       timestamp: commit.timestamp,
+      repo: payload.repository.full_name,
     });
   }
   influx.flush();
@@ -44,13 +45,32 @@ const evaluatePushEvent = (payload) => {
 const evaluateDeploymentStatusEvent = (payload) => {
   if (payload.deployment_status.state === "success")
     influx.writeDeploymentEvent({
-      sha: payload.deployment.sha,
+      id: payload.deployment.sha,
       timestamp: payload.deployment.updated_at,
+      repo: payload.repository.full_name,
     });
 };
 
-const evaluateIssueEvent = (payload) => {
-  //TODO: implement
+const evaluateIssuesEvent = (payload) => {
+  if (payload.action === "labeled" && payload.label.name === "incident") {
+    influx.writeIncidentEvent({
+      id: payload.issue.id,
+      timestamp: payload.issue.created_at,
+      repo: payload.repository.full_name,
+    });
+  }
+
+  if (payload.action === "closed" && hasLabel(payload.issue, "incident")) {
+    influx.writeRestoreEvent({
+      id: payload.issue.id,
+      timestamp: payload.issue.closed_at,
+      repo: payload.repository.full_name,
+    });
+  }
+};
+
+const hasLabel = (issue, labelName) => {
+  return !!issue.labels.find((label) => label.name === labelName);
 };
 
 module.exports = router;
