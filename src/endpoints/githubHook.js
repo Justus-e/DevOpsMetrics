@@ -2,7 +2,23 @@ const express = require("express");
 const router = express.Router();
 const influx = require("../influx");
 
-//TODO: Add swagger doku
+/**
+ * @swagger
+ *  tags:
+ *      name: GitHub Webhook
+ *      description: Endpoint for GitHub WebHooks to post to
+ */
+
+/**
+ * @swagger
+ * /github-hook:
+ *  post:
+ *      summary: Post GitHub Webhook events here
+ *      tags: [GitHub Webhook]
+ *      responses:
+ *          200:
+ *              description: OK
+ */
 router.post("/github-hook", async (req, res) => {
   try {
     const eventType = req.header("X-GitHub-Event");

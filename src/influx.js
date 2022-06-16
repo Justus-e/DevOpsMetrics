@@ -60,6 +60,14 @@ const queryEvents = (eventType, range) => {
   });
 };
 
+const queryLastDeployEvent = () => {
+  const query = `from(bucket: "${bucket}") |> range(start: -100d) |> filter(fn: (r) => r._measurement == "deployment") |> last()`;
+
+  return queryApi.collectRows(query).catch((error) => {
+    console.error(error);
+  });
+};
+
 const flush = () => {
   writeApi.flush().catch((e) => {
     console.error(e);
@@ -73,4 +81,5 @@ module.exports = {
   writeRestoreEvent,
   flush,
   queryEvents,
+  queryLastDeployEvent,
 };
