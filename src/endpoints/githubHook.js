@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const influx = require("../influx");
+const axios = require("axios");
 
 /**
  * @swagger
@@ -59,12 +60,18 @@ const evaluatePushEvent = (payload) => {
 };
 
 const evaluateDeploymentStatusEvent = (payload) => {
-  if (payload.deployment_status.state === "success")
+  if (payload.deployment_status.state === "success") {
+    const commits = axios.get(
+      `https://api.github.com/repos/${payload.repository.full_name}/commits`,
+      { headers: { "User-Agent": payload.sender.login } }
+    );
+    commits.then((res) => console.log(res));
     influx.writeDeploymentEvent({
       id: payload.deployment.sha,
       timestamp: payload.deployment.updated_at,
       repo: payload.repository.full_name,
     });
+  }
 };
 
 const evaluateIssuesEvent = (payload) => {
