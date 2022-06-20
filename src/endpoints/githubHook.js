@@ -53,13 +53,7 @@ const evaluatePushEvent = async (payload) => {
     return;
   }
 
-  const query = await influx.queryLastDeployEvent();
-  const lastDeploy = query[0];
-
-  const api_commits = await axios.get(
-    `${GITHUB_URL}/repos/${payload.repository.full_name}/commits?since=${lastDeploy._time}`,
-    { headers: { "User-Agent": payload.sender.login } }
-  );
+  let api_commits = await getApiCommits(payload);
 
   commits = commits.map((c) => {
     return {
@@ -82,21 +76,17 @@ const evaluatePushEvent = async (payload) => {
 };
 
 const evaluateDeploymentStatusEvent = async (payload) => {
-  if (payload.deployment_status.state === "success") {
-    const query = await influx.queryLastDeployEvent();
-    const lastDeploy = query[0];
-
-    const commits = await axios.get(
-      `${GITHUB_URL}/repos/${payload.repository.full_name}/commits?since=${lastDeploy._time}`,
-      { headers: { "User-Agent": payload.sender.login } }
-    );
-
-    influx.writeDeploymentEvent({
-      id: payload.deployment.sha,
-      changes: commits.data.map((c) => c.sha),
-      repo: payload.repository.full_name,
-    });
+  if (payload.deployment_status.state !== "success") {
+    return;
   }
+
+  const commits = await getApiCommits(payload);
+
+  influx.writeDeploymentEvent({
+    id: payload.deployment.sha,
+    changes: commits.data.map((c) => c.sha),
+    repo: payload.repository.full_name,
+  });
 };
 
 const evaluateIssuesEvent = (payload) => {
@@ -119,6 +109,32 @@ const evaluateIssuesEvent = (payload) => {
 
 const hasLabel = (issue, labelName) => {
   return !!issue.labels.find((label) => label.name === labelName);
+};
+
+const getLastDeploy = async () => {
+  const result = await influx.queryLastDeployEvent();
+  if (result.length === 1) {
+    return {
+      id: result[0]._value,
+      timestamp: result[0]._time,
+    };
+  }
+};
+
+const getApiCommits = async (payload) => {
+  const lastDeploy = await getLastDeploy();
+
+  if (lastDeploy) {
+    return axios.get(
+      `${GITHUB_URL}/repos/${payload.repository.full_name}/commits?since=${lastDeploy.timestamp}`,
+      { headers: { "User-Agent": payload.sender.login } }
+    );
+  } else {
+    return axios.get(
+      `${GITHUB_URL}/repos/${payload.repository.full_name}/commits`,
+      { headers: { "User-Agent": payload.sender.login } }
+    );
+  }
 };
 
 module.exports = router;
