@@ -3,7 +3,7 @@ const router = express.Router();
 const influx = require("../influx");
 const axios = require("axios");
 
-const GITHUB_URL = process.env.GITHUB_URL || "https://api.github.com/";
+const GITHUB_URL = process.env.GITHUB_URL || "https://api.github.com";
 
 /**
  * @swagger
