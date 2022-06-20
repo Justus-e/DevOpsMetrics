@@ -3,6 +3,8 @@ const router = express.Router();
 const influx = require("../influx");
 const axios = require("axios");
 
+const GITHUB_URL = process.env.GITHUB_URL || "https://api.github.com/";
+
 /**
  * @swagger
  *  tags:
@@ -64,7 +66,7 @@ const evaluateDeploymentStatusEvent = async (payload) => {
     const lastDeploy = query[0];
 
     const commits = await axios.get(
-      `https://api.github.com/repos/${payload.repository.full_name}/commits?since=${lastDeploy._time}`,
+      `${GITHUB_URL}/repos/${payload.repository.full_name}/commits?since=${lastDeploy._time}`,
       { headers: { "User-Agent": payload.sender.login } }
     );
 
