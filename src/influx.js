@@ -20,6 +20,8 @@ const writeDeploymentEvent = (deployment) => {
       .tag("repo", deployment.repo)
       .timestamp(new Date(deployment.timestamp));
 
+    console.log("point", point);
+
     writeApi.writePoint(point);
   }
   flush();
