@@ -49,6 +49,10 @@ const evaluateEvent = async (eventType, payload) => {
 const evaluatePushEvent = async (payload) => {
   let commits = payload.commits;
 
+  if (!commits || !payload.ref.includes(payload.repository.master_branch)) {
+    return;
+  }
+
   const query = await influx.queryLastDeployEvent();
   const lastDeploy = query[0];
 
