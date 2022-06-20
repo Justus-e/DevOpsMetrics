@@ -49,7 +49,6 @@ const evaluatePushEvent = (payload) => {
   console.log(commits.length);
   for (const commit of commits) {
     influx.writeChangeEvent({
-      pushSha: payload.after, // todo: maybe not necessary
       ref: payload.ref,
       id: commit.id,
       timestamp: commit.timestamp,

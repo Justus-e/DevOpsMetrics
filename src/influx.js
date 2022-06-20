@@ -30,7 +30,6 @@ const writeDeploymentEvent = (deployment) => {
  */
 const writeChangeEvent = (change) => {
   const point = new Point("change")
-    .stringField("pushSha", change.pushSha)
     .stringField("id", change.id)
     .tag("ref", change.ref)
     .tag("repo", change.repo)

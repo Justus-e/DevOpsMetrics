@@ -10,7 +10,7 @@ const options = {
       title: "DevOpsMetrics API",
       version: "1.0.0",
       description:
-        "This API is collecting events via the /events endpoint and will calculate the four DORA metrics from them.",
+        "This API is collecting events via the /events endpoint and will send those to influxDB and calculate the four DORA metrics from them.",
       contact: {
         name: "Justus Ernst",
         url: "https://github.com/justus-e",
@@ -19,10 +19,10 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:8080/api/",
+        url: "https://dev-ops-metrics.herokuapp.com/api/",
       },
       {
-        url: "https://dev-ops-metrics.herokuapp.com/api/",
+        url: "http://localhost:8080/api/",
       },
     ],
     security: [
