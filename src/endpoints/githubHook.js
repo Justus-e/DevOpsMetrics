@@ -23,7 +23,7 @@ const axios = require("axios");
 router.post("/github-hook", async (req, res) => {
   try {
     const eventType = req.header("X-GitHub-Event");
-    evaluateEvent(eventType, req.body);
+    await evaluateEvent(eventType, req.body);
     res.sendStatus(200);
   } catch (err) {
     console.error(err);
@@ -31,7 +31,7 @@ router.post("/github-hook", async (req, res) => {
   }
 });
 
-const evaluateEvent = (eventType, payload) => {
+const evaluateEvent = async (eventType, payload) => {
   switch (eventType) {
     case "push":
       return evaluatePushEvent(payload);
@@ -59,15 +59,19 @@ const evaluatePushEvent = (payload) => {
   influx.flush();
 };
 
-const evaluateDeploymentStatusEvent = (payload) => {
+const evaluateDeploymentStatusEvent = async (payload) => {
   if (payload.deployment_status.state === "success") {
-    const commits = axios.get(
-      `https://api.github.com/repos/${payload.repository.full_name}/commits`,
+    const query = await influx.queryLastDeployEvent();
+    const lastDeploy = query[0];
+
+    const commits = await axios.get(
+      `https://api.github.com/repos/${payload.repository.full_name}/commits?since=${lastDeploy._time}`,
       { headers: { "User-Agent": payload.sender.login } }
     );
-    commits.then((res) => console.log(res));
+
     influx.writeDeploymentEvent({
       id: payload.deployment.sha,
+      changes: commits.data.map((c) => c.sha),
       timestamp: payload.deployment.updated_at,
       repo: payload.repository.full_name,
     });

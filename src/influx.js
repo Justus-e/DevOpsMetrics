@@ -13,12 +13,15 @@ const writeApi = client.getWriteApi(org, bucket);
 const queryApi = client.getQueryApi(org);
 
 const writeDeploymentEvent = (deployment) => {
-  const point = new Point("deployment")
-    .stringField("id", deployment.sha)
-    .tag("repo", deployment.repo)
-    .timestamp(new Date(deployment.timestamp));
+  for (const change of deployment.changes) {
+    const point = new Point("deployment")
+      .stringField("id", deployment.id)
+      .stringField("change", change)
+      .tag("repo", deployment.repo)
+      .timestamp(new Date(deployment.timestamp));
 
-  writeApi.writePoint(point);
+    writeApi.writePoint(point);
+  }
   flush();
 };
 
