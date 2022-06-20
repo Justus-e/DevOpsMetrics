@@ -87,8 +87,6 @@ const evaluateDeploymentStatusEvent = async (payload) => {
       { headers: { "User-Agent": payload.sender.login } }
     );
 
-    console.log("Commits", commits.data);
-
     influx.writeDeploymentEvent({
       id: payload.deployment.sha,
       changes: commits.data.map((c) => c.sha),
