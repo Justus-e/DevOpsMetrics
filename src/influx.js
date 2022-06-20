@@ -18,7 +18,7 @@ const writeDeploymentEvent = (deployment) => {
       .stringField("id", deployment.id)
       .stringField("change", change)
       .tag("repo", deployment.repo)
-      .timestamp(new Date(deployment.timestamp));
+      .timestamp(new Date());
 
     console.log("point", point);
 

@@ -46,14 +46,31 @@ const evaluateEvent = async (eventType, payload) => {
   }
 };
 
-const evaluatePushEvent = (payload) => {
-  const commits = payload.commits;
-  console.log(commits.length);
+const evaluatePushEvent = async (payload) => {
+  let commits = payload.commits;
+
+  const query = await influx.queryLastDeployEvent();
+  const lastDeploy = query[0];
+
+  const api_commits = await axios.get(
+    `${GITHUB_URL}/repos/${payload.repository.full_name}/commits?since=${lastDeploy._time}`,
+    { headers: { "User-Agent": payload.sender.login } }
+  );
+
+  commits = commits.map((c) => {
+    return {
+      id: c.id,
+      time: api_commits.data.find((it) => it.sha === c.id).commit.author.date,
+    };
+  });
+
+  console.log("commits:", commits);
+
   for (const commit of commits) {
     influx.writeChangeEvent({
       ref: payload.ref,
       id: commit.id,
-      timestamp: commit.timestamp,
+      timestamp: commit.time,
       repo: payload.repository.full_name,
     });
   }
@@ -75,7 +92,6 @@ const evaluateDeploymentStatusEvent = async (payload) => {
     influx.writeDeploymentEvent({
       id: payload.deployment.sha,
       changes: commits.data.map((c) => c.sha),
-      timestamp: payload.deployment.updated_at,
       repo: payload.repository.full_name,
     });
   }
