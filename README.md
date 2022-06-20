@@ -1,3 +1,4 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/justus-e/devopsmetrics/badge)](https://www.codefactor.io/repository/github/justus-e/devopsmetrics)
 # DevOpsMetrics
 
 A tool to measure software delivery performance by calculating the four DORA Metrics
