@@ -82,8 +82,6 @@ const evaluateDeploymentStatusEvent = async (payload) => {
 
   const commits = await getApiCommits(payload);
 
-  console.log(commits);
-
   influx.writeDeploymentEvent({
     id: payload.deployment.sha,
     changes: commits.data.map((c) => c.sha),
@@ -125,8 +123,7 @@ const getLastDeploy = async () => {
 
 const getApiCommits = async (payload) => {
   const lastDeploy = await getLastDeploy();
-
-  if (lastDeploy) {
+  if (!!lastDeploy) {
     console.log("last deploy: ", lastDeploy);
     return axios.get(
       `${GITHUB_URL}/repos/${payload.repository.full_name}/commits?since=${lastDeploy.timestamp}`,

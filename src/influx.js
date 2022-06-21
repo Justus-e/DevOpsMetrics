@@ -63,7 +63,11 @@ const queryEvents = (query) => {
 };
 
 const queryLastDeployEvent = () => {
-  const query = `from(bucket: "${bucket}") |> range(start: -100d) |> filter(fn: (r) => r._measurement == "deployment") |> last()`;
+  const query = `
+    from(bucket: "${bucket}") 
+    |> range(start: -100d) 
+    |> filter(fn: (r) => r._measurement == "deployment" and r._field == "id") 
+    |> last()`;
 
   return queryApi.collectRows(query).catch((error) => {
     console.error(error);
