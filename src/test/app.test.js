@@ -10,7 +10,6 @@ describe("Test app.js", () => {
 
   test("Swagger route should be returning 200", async () => {
     const response = await request(app).get("/swagger/");
-    console.log(response);
     expect(response.statusCode).toBe(200);
   });
 });
