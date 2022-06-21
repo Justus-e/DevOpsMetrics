@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const deploymentFrequency = require("../metrics/deploymentFrequency");
+const leadTime = require("../metrics/leadTime");
 
 /** Metrics MODEL
  * @swagger
@@ -47,8 +48,8 @@ const deploymentFrequency = require("../metrics/deploymentFrequency");
 router.get("/metrics", async (_req, res) => {
   try {
     const metrics = {
-      deploymentFrequency: await deploymentFrequency.getMetric(),
-      leadTime: 0,
+      deploymentFrequency: await deploymentFrequency(),
+      leadTime: await leadTime(),
       changeFailRate: 0,
       timeToRecovery: 0,
     };

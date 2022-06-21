@@ -56,9 +56,7 @@ const writeRestoreEvent = (restore) => {
   flush();
 };
 
-const queryEvents = (eventType, range) => {
-  const query = `from(bucket: "${bucket}") |> range(start: ${range}) |> filter(fn: (r) => r._measurement == "${eventType}")`;
-
+const queryEvents = (query) => {
   return queryApi.collectRows(query).catch((error) => {
     console.error(error);
   });
