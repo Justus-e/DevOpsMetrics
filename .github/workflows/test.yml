@@ -1,28 +1,25 @@
 name: Test
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
-    branches: ["main"]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  get_git_hash:
-    # The type of runner that the job will run on
+  test:
+    name: test app
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3.0.2
+      - uses: actions/checkout@v2.4.2
 
-      - name: Get Commit Hash
-        id: vars
-        shell: bash
-        run: |
-          echo "::set-output name=commit_hash::$(git rev-parse --short "$GITHUB_SHA")"
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
 
-      # Runs a single command using the runners shell
-      - name: Output Hash
-        run: |
-          echo "Hash: ${{ steps.vars.outputs.commit_hash }}"
+      - name: Install Dependencies
+        run: npm install
+
+      - name: run tests
+        run: npm test
