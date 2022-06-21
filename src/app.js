@@ -17,7 +17,7 @@ app.use("/api/*", auth());
 const ENDPOINT = "./endpoints/";
 
 app.get("/", (_req, res) => {
-  res.send("DevOpsMetrics Api is Running");
+  res.status(200).send("DevOpsMetrics Api is Running");
 });
 app.use(require(ENDPOINT + "swagger"));
 
@@ -26,14 +26,4 @@ app.use("/api", require(ENDPOINT + "metrics"));
 app.use("/api", require(ENDPOINT + "githubHook"));
 app.use("/api", require(ENDPOINT + "lastDeploy"));
 
-//----------------------------------------------------------------------------------------------------------------------
-
-const port = process.env.PORT || 8080;
-
-app.listen(port, () => {
-  console.log("server running at port: " + port);
-  if (!process.env.PORT) {
-    console.log(`Root: http://localhost:${port}/`);
-    console.log(`Docs: http://localhost:${port}/swagger`);
-  }
-});
+module.exports = app;

@@ -20,4 +20,3 @@ Api Docs: `http://<your_host>/swagger`
 | **INFLUX_ORG**    | _required_ - Organization name of the InfluxDB instance                                                       | 'DevOpsMetrics'           |
 | **INFLUX_BUCKET** | _required_ - Name of the InfluxDB bucket where the events should be stored                                    | 'events'                  |
 | **GITHUB_URL**    | _optional_ - GitHub URL of GitHub Server where the tracked Repo is stored (default: 'https://api.github.com') | 'https://api.github.com'  |
- test
