@@ -4,9 +4,9 @@
   "description": "A tool to calculate the four DORA metrics",
   "main": "src/app.ts",
   "scripts": {
-    "dev": "nodemon src/app.js",
-    "start": "node src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -35,7 +35,10 @@
     "swagger-ui-express": "^4.4.0"
   },
   "devDependencies": {
+    "jest": "^28.1.1",
     "nodemon": "2.0.16",
-    "prettier": "2.7.1"
+    "prettier": "2.7.1",
+    "superagent": "^7.1.6",
+    "supertest": "^6.2.3"
   }
 }
