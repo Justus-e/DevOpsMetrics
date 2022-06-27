@@ -1,7 +1,8 @@
-const express = require("express");
-const router = express.Router();
-const deploymentFrequency = require("../metrics/deploymentFrequency");
-const leadTime = require("../metrics/leadTime");
+import { Router } from "express";
+import deploymentFrequency from "../metrics/deploymentFrequency";
+import leadTime from "../metrics/leadTime";
+
+const router = Router();
 
 /** Metrics MODEL
  * @swagger
@@ -60,4 +61,4 @@ router.get("/metrics", async (_req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

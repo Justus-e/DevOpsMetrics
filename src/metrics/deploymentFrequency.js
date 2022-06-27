@@ -1,4 +1,5 @@
-const influx = require("../influx");
+import influx from "../influx";
+
 const bucket = process.env.INFLUX_BUCKET;
 
 const getMetric = async () => {
@@ -14,4 +15,4 @@ const getMetric = async () => {
   return influx.queryEvents(query);
 };
 
-module.exports = getMetric;
+export default getMetric;

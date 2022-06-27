@@ -1,4 +1,4 @@
-const { InfluxDB } = require("@influxdata/influxdb-client");
+import { InfluxDB, Point } from "@influxdata/influxdb-client";
 
 const org = process.env.INFLUX_ORG;
 const bucket = process.env.INFLUX_BUCKET;
@@ -8,7 +8,6 @@ const client = new InfluxDB({
   token: process.env.INFLUX_TOKEN,
 });
 
-const { Point } = require("@influxdata/influxdb-client");
 const writeApi = client.getWriteApi(org, bucket);
 const queryApi = client.getQueryApi(org);
 
@@ -80,7 +79,7 @@ const flush = () => {
   });
 };
 
-module.exports = {
+export default {
   writeDeploymentEvent,
   writeChangeEvent,
   writeIncidentEvent,

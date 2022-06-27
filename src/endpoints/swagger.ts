@@ -1,7 +1,8 @@
-const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express");
-const express = require("express");
-const router = express.Router();
+import * as swaggerJSDoc from "swagger-jsdoc";
+import { serve, setup } from "swagger-ui-express";
+import { Router } from "express";
+
+const router = Router();
 
 const options = {
   definition: {
@@ -43,7 +44,7 @@ const options = {
   apis: ["./src/endpoints/*.js"],
 };
 
-const specs = swaggerJsdoc(options);
-router.use("/swagger", swaggerUi.serve, swaggerUi.setup(specs));
+const specs = swaggerJSDoc(options);
+router.use("/swagger", serve, setup(specs));
 
-module.exports = router;
+export default router;

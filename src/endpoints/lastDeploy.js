@@ -1,6 +1,7 @@
-const express = require("express");
-const router = express.Router();
-const influx = require("../influx");
+import { Router } from "express";
+import influx from "../influx";
+
+const router = Router();
 
 /** lastDeploy MODEL
  * @swagger
@@ -59,4 +60,4 @@ router.get("/last-deployment", async (_req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

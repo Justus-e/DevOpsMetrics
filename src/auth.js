@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+import crypto from "crypto";
 
 const authenticate = () => (req, res, next) => {
   if (
@@ -25,4 +25,4 @@ const authenticate = () => (req, res, next) => {
   next();
 };
 
-module.exports = authenticate;
+export default authenticate;

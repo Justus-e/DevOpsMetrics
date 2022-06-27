@@ -1,4 +1,4 @@
-const auth = require("../auth");
+import auth from "../auth";
 
 describe("Test auth.js", () => {
   beforeAll(() => {

@@ -1,7 +1,8 @@
-const express = require("express");
-const router = express.Router();
-const influx = require("../influx");
-const axios = require("axios");
+import { Router } from "express";
+import axios from "axios";
+import influx from "../influx";
+
+const router = Router();
 
 const GITHUB_URL = process.env.GITHUB_URL || "https://api.github.com";
 
@@ -138,4 +139,4 @@ const getApiCommits = async (payload) => {
   }
 };
 
-module.exports = router;
+export default router;
