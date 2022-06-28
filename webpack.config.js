@@ -1,4 +1,6 @@
 const CopyPlugin = require("copy-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 module.exports = {
   entry: "./src/server.ts",
   output: {
@@ -48,5 +50,7 @@ module.exports = {
         "./node_modules/swagger-ui-dist/favicon-32x32.png",
       ],
     }),
+    new CleanWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin(),
   ],
 };

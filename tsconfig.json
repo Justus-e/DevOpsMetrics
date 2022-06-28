@@ -2,8 +2,11 @@
   "compilerOptions": {
     "outDir": "./dist",
     "allowJs": true,
+    "module": "CommonJS",
     "target": "es5",
-    "allowSyntheticDefaultImports": true
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
   },
   "include": [
     "./src/**/*"
