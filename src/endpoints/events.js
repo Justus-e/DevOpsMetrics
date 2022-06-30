@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const influx = require("../influx");
+const joi = require("joi");
 
 /** Event MODEL
  * @swagger
@@ -133,6 +134,8 @@ const influx = require("../influx");
  */
 router.post("/events", (req, res) => {
   try {
+    joi.assert(req.body, requestSchema);
+
     const { eventType, payload } = req.body;
     switch (eventType) {
       case "deployment":
@@ -146,15 +149,51 @@ router.post("/events", (req, res) => {
         break;
       case "restore":
         influx.writeRestoreEvent(payload);
-        break;
-      default:
-        res.status(400).send("unknown eventType");
     }
     res.status(200).send(`Event of type '${eventType}' added!`);
   } catch (err) {
-    console.error(err);
+    if (err.name === "ValidationError") {
+      res.status(400).send(err.annotate(true));
+    }
+    console.log(err);
     res.sendStatus(500);
   }
+});
+
+const requestSchema = joi.object({
+  eventType: joi
+    .any()
+    .valid("deployment", "change", "incident", "restore")
+    .required(),
+  payload: joi.alternatives().conditional(joi.ref("eventType"), {
+    switch: [
+      {
+        is: "deployment",
+        then: joi.object({
+          id: joi.string().required(),
+          repo: joi.string().required(),
+          changes: joi.array().items(joi.string()).required(),
+        }),
+      },
+      {
+        is: "change",
+        then: joi.object({
+          id: joi.string().required(),
+          repo: joi.string().required(),
+          timestamp: joi.date().required(),
+          ref: joi.string().required(),
+        }),
+      },
+      {
+        is: joi.string().valid("incident", "restore"),
+        then: joi.object({
+          id: joi.string().required(),
+          repo: joi.string().required(),
+          timestamp: joi.date().required(),
+        }),
+      },
+    ],
+  }),
 });
 
 module.exports = router;
