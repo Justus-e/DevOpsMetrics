@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const influx = require("../influx");
-const axios = require("axios");
-
-const GITHUB_URL = process.env.GITHUB_URL || "https://api.github.com";
+const { getApiCommits } = require("../githubApi");
 
 /**
  * @swagger
@@ -109,33 +107,6 @@ const evaluateIssuesEvent = (payload) => {
 
 const hasLabel = (issue, labelName) => {
   return !!issue.labels.find((label) => label.name === labelName);
-};
-
-const getLastDeploy = async () => {
-  const result = await influx.queryLastDeployEvent();
-  if (result.length === 1) {
-    return {
-      id: result[0]._value,
-      timestamp: result[0]._time,
-    };
-  }
-};
-
-const getApiCommits = async (payload) => {
-  const lastDeploy = await getLastDeploy();
-  if (!!lastDeploy) {
-    console.log("last deploy: ", lastDeploy);
-    return axios.get(
-      `${GITHUB_URL}/repos/${payload.repository.full_name}/commits?since=${lastDeploy.timestamp}`,
-      { headers: { "User-Agent": payload.sender.login } }
-    );
-  } else {
-    console.log("no last deploy found");
-    return axios.get(
-      `${GITHUB_URL}/repos/${payload.repository.full_name}/commits`,
-      { headers: { "User-Agent": payload.sender.login } }
-    );
-  }
 };
 
 module.exports = router;
