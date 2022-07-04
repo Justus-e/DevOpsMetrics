@@ -38,7 +38,7 @@
     "jest": "28.1.2",
     "nodemon": "2.0.16",
     "prettier": "2.7.1",
-    "superagent": "7.1.6",
+    "superagent": "8.0.0",
     "supertest": "6.2.4"
   }
 }
