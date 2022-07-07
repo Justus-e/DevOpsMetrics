@@ -19,10 +19,7 @@ const options = {
     },
     servers: [
       {
-        url: "https://dev-ops-metrics.herokuapp.com/api/",
-      },
-      {
-        url: "http://localhost:8080/api/",
+        url: "/api/",
       },
     ],
     security: [
