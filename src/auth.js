@@ -9,7 +9,7 @@ const authenticate = () => (req, res, next) => {
   }
 
   const githubSignature = req.header("X-Hub-Signature-256");
-  if (!!githubSignature) {
+  if (githubSignature) {
     const expectedSignature =
       "sha256=" +
       crypto
