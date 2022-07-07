@@ -4,11 +4,12 @@
 
 A tool to measure software delivery performance by calculating the four DORA Metrics
 
-## Local Dev
+## Start Container
 
-Run locally: `npm run dev`
+Build: `docker build . -t justus-e/devopsmetrics`
 
-Api Docs: `http://<your_host>/swagger`
+Run: `docker run --name devopsmetrics --env-file <your_env_file> -p <PORT>:8080 -d justus-e/devopsmetrics`
+
 
 ## Environment Variables
 
@@ -43,3 +44,9 @@ _optional if the Repository is public and on the regular GitHub server_
 5. For Secret paste your `API_KEY` that you set in your ENV-Vars
 6. Select `Let me select individual events`
 7. Check `Deployment statuses`, `Issues` and `Pushes`
+
+## Local Dev
+
+Run locally: `npm run dev`
+
+Api Docs: `http://<your_host>/swagger`
