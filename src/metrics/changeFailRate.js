@@ -1,11 +1,11 @@
 const influx = require("../influx");
 const bucket = process.env.INFLUX_BUCKET;
 
-const getMetric = async () => {
+const getMetric = async (timeRange = "1w") => {
   const query = `
     import "array"
     incident = from(bucket: "${bucket}")
-    |> range(start: -1w)
+    |> range(start: -${timeRange})
     |> filter(fn: (r) => r["_measurement"] == "incident")
     |> count()
     |> findColumn(
@@ -14,7 +14,7 @@ const getMetric = async () => {
       )
 
     deployment = from(bucket: "${bucket}")
-    |> range(start: -1w)
+    |> range(start: -${timeRange})
     |> filter(fn: (r) => r["_measurement"] == "deployment" and r["_field"] == "id")
     |> unique(column: "_value")
     |> count()
@@ -31,7 +31,13 @@ const getMetric = async () => {
     )
     `;
 
-  return influx.queryEvents(query);
+  const res = await influx.queryEvents(query);
+
+  if (res.length !== 1) {
+    throw Error("Change Fail Rate could not be queried");
+  }
+
+  return res[0]._value;
 };
 
 module.exports = getMetric;

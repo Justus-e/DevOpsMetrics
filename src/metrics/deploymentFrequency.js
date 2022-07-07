@@ -1,17 +1,23 @@
 const influx = require("../influx");
 const bucket = process.env.INFLUX_BUCKET;
 
-const getMetric = async () => {
+const getMetric = async (timeRange = "1w") => {
   const query = `
       from(bucket: "${bucket}")
-      |> range(start: -1w)
+      |> range(start: -${timeRange})
       |> filter(fn: (r) => r["_measurement"] == "deployment" and r["_field"] == "id")
       |> unique(column: "_value")
       |> aggregateWindow(every: 1d, fn: count)
       |> mean()
       `;
 
-  return influx.queryEvents(query);
+  const res = await influx.queryEvents(query);
+
+  if (res.length !== 1) {
+    throw Error("Deployment Frequency could not be queried");
+  }
+
+  return res[0]._value;
 };
 
 module.exports = getMetric;
