@@ -1,0 +1,955 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_INFLUXDB-PROD",
+      "label": "InfluxDB-prod",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    }
+  ],
+  "__elements": [],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "8.5.4"
+    },
+    {
+      "type": "datasource",
+      "id": "influxdb",
+      "name": "InfluxDB",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${DS_INFLUXDB-PROD}"
+        },
+        "enable": false,
+        "hide": false,
+        "iconColor": "blue",
+        "mappings": {
+          "id": {
+            "source": "field",
+            "value": "id Justus-e/DevOpsMetrics"
+          },
+          "time": {
+            "source": "field",
+            "value": "Time"
+          },
+          "title": {
+            "source": "field",
+            "value": "Deployment"
+          }
+        },
+        "name": "deployments",
+        "target": {
+          "query": "from(bucket: \"events\")\r\n|> range(start: ${__from:date}, stop: ${__to:date})\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n|> unique(column: \"_value\")",
+          "refId": "Anno"
+        }
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${DS_INFLUXDB-PROD}"
+        },
+        "enable": false,
+        "iconColor": "red",
+        "mappings": {
+          "id": {
+            "source": "field",
+            "value": "id Justus-e/DevOpsMetrics"
+          },
+          "time": {
+            "source": "field",
+            "value": "Time"
+          },
+          "title": {
+            "source": "field",
+            "value": "Incident"
+          }
+        },
+        "name": "incidents",
+        "target": {
+          "query": "from(bucket: \"events\")\r\n|> range(start: ${__from:date}, stop: ${__to:date})\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n|> unique(column: \"_value\")",
+          "refId": "Anno"
+        }
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${DS_INFLUXDB-PROD}"
+        },
+        "enable": false,
+        "iconColor": "purple",
+        "mappings": {
+          "text": {
+            "source": "field",
+            "value": "id {ref=\"refs/heads/main\", repo=\"Justus-e/DevOpsMetrics\"}"
+          },
+          "time": {
+            "source": "field",
+            "value": "Time"
+          },
+          "title": {
+            "source": "field",
+            "value": "Change"
+          }
+        },
+        "name": "changes",
+        "target": {
+          "query": "from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"change\")",
+          "refId": "Anno"
+        }
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "iteration": 1657203993920,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 20,
+      "panels": [],
+      "title": "Deployment Frequency",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB-PROD}"
+      },
+      "description": "Average amount of deploys per day and per week",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-red",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.25
+              },
+              {
+                "color": "#EAB839",
+                "value": 1
+              },
+              {
+                "color": "green",
+                "value": 5
+              }
+            ]
+          },
+          "unit": "deploys / week"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "deploys / day"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "#EAB839",
+                      "value": 0.1
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.8
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {},
+        "textMode": "value"
+      },
+      "pluginVersion": "8.5.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB-PROD}"
+          },
+          "query": "from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n  |> unique(column: \"_value\")\r\n  |> aggregateWindow(every: 1w, fn: count)\r\n  |> mean()",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB-PROD}"
+          },
+          "hide": false,
+          "query": "from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n  |> unique(column: \"_value\")\r\n  |> aggregateWindow(every: 1d, fn: count)\r\n  |> mean()",
+          "refId": "B"
+        }
+      ],
+      "title": "Deployment Frequency",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB-PROD}"
+      },
+      "description": "Average Daily amount of deploys per week in the past 30 days",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 3,
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 5,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "area"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              },
+              {
+                "color": "yellow",
+                "value": 0.8
+              },
+              {
+                "color": "green",
+                "value": 2
+              }
+            ]
+          },
+          "unit": "deploys / day"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB-PROD}"
+          },
+          "query": "import \"date\"\r\n\r\nfrom(bucket: \"events\")\r\n  |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n  |> unique(column: \"_value\")\r\n  |> aggregateWindow(every: 1d, fn: count)\r\n  |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)\r\n ",
+          "refId": "A"
+        }
+      ],
+      "title": "Deployment Frequency",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "id": 18,
+      "panels": [],
+      "title": "Lead Time",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB-PROD}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ns"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.5.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB-PROD}"
+          },
+          "query": "deploys = from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"change\")\r\n\r\nchanges = from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"change\" and r[\"_field\"] == \"id\")\r\n\r\njoin(\r\n    tables: {change:changes, deploy:deploys},\r\n    on: [\"_value\"],\r\n)\r\n  |> map(fn: (r) => ({_value: uint(v: r[\"_time_deploy\"]) - uint(v: r[\"_time_change\"])}))\r\n  |> mean()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Lead Time",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB-PROD}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 5,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ns"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.5.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB-PROD}"
+          },
+          "query": "import \"date\"\r\n\r\ndeploys = from(bucket: \"events\")\r\n  |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"change\")\r\n\r\nchanges = from(bucket: \"events\")\r\n  |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"change\" and r[\"_field\"] == \"id\")\r\n\r\njoin(\r\n    tables: {change:changes, deploy:deploys},\r\n    on: [\"_value\"],\r\n)\r\n  |> map(fn: (r) => ({_value: uint(v: r[\"_time_deploy\"]) - uint(v: r[\"_time_change\"]), _time: r[\"_time_deploy\"]}))\r\n  |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Lead Time",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "id": 16,
+      "panels": [],
+      "title": "Change Fail Rate",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB-PROD}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0.15
+              },
+              {
+                "color": "#EAB839",
+                "value": 0.2
+              },
+              {
+                "color": "orange",
+                "value": 0.25
+              },
+              {
+                "color": "red",
+                "value": 0.3
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 15
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.5.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB-PROD}"
+          },
+          "query": "import \"array\"\r\nincident = from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n    |> count()\r\n    |> findColumn(\r\n        fn: (key) => key._field == \"id\",\r\n        column: \"_value\",\r\n    )\r\n\r\ndeployment = from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n    |> unique(column: \"_value\")\r\n    |> count()\r\n    |> findColumn(\r\n        fn: (key) => key._field == \"id\",\r\n        column: \"_value\",\r\n    )\r\n\r\narray.from(rows: \r\n  if deployment |> length() == 1 and incident |> length() == 1 then\r\n    [{_value: float(v: incident[0]) / float(v: deployment[0]) }]\r\n  else \r\n    [{_value: float(v: 0)}] \r\n)",
+          "refId": "A"
+        }
+      ],
+      "title": "Change Fail Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB-PROD}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 0.3,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 5,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "area"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0.15
+              },
+              {
+                "color": "#EAB839",
+                "value": 0.2
+              },
+              {
+                "color": "orange",
+                "value": 0.25
+              },
+              {
+                "color": "red",
+                "value": 0.3
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 15
+      },
+      "id": 21,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.5.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB-PROD}"
+          },
+          "query": "import \"array\"\r\nimport \"date\"\r\n\r\nincident = from(bucket: \"events\")\r\n    |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n    |> aggregateWindow(every: ${AggregateInterval}, fn: count)\r\n  \r\ndeployment = from(bucket: \"events\")\r\n    |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n    |> unique(column: \"_value\")\r\n    |> aggregateWindow(every: ${AggregateInterval}, fn: count)\r\n \r\njoin(\r\n    tables: {incident:incident, deployment:deployment},\r\n    on: [\"_time\"],\r\n)\r\n    |> map(fn: (r) => ({ \r\n    _value: \r\n        if r[\"_value_deployment\"] == 0 then \r\n            float(v: 0)\r\n        else\r\n            float(v: r[\"_value_incident\"]) / float(v: r[\"_value_deployment\"]),\r\n    _time: r[\"_time\"]\r\n    }))",
+          "refId": "A"
+        }
+      ],
+      "title": "Change Fail Rate",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 21
+      },
+      "id": 14,
+      "panels": [],
+      "title": "Mean Time to Restore",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB-PROD}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ns"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 22
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.5.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB-PROD}"
+          },
+          "query": "incident = from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n\r\nrestore = from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"restore\")\r\n\r\njoin(\r\n        tables: {incident:incident, restore:restore},\r\n        on: [\"_value\"],\r\n    )\r\n    |> map(fn: (r) => ({_value: uint(v: r[\"_time_restore\"]) - uint(v: r[\"_time_incident\"])}))\r\n    |> mean()",
+          "refId": "A"
+        }
+      ],
+      "title": "Mean Time to Restore",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB-PROD}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 5,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ns"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 22
+      },
+      "id": 22,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.5.4",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB-PROD}"
+          },
+          "query": "import \"date\"\r\n\r\nincident = from(bucket: \"events\")\r\n  |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n\r\nrestore = from(bucket: \"events\")\r\n  |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"restore\")\r\n\r\njoin(\r\n        tables: {incident:incident, restore:restore},\r\n        on: [\"_value\"],\r\n    )\r\n    |> map(fn: (r) => ({_value: uint(v: r[\"_time_restore\"]) - uint(v: r[\"_time_incident\"]), _time: r[\"_time_incident\"]}))\r\n    |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)",
+          "refId": "A"
+        }
+      ],
+      "title": "Mean Time to Restore",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "1h",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "auto": true,
+        "auto_count": 20,
+        "auto_min": "1d",
+        "current": {
+          "selected": true,
+          "text": "7d",
+          "value": "7d"
+        },
+        "description": "Time Interval that is aggregated to one single point for the time series diagrams",
+        "hide": 0,
+        "label": "Aggregation Interval",
+        "name": "AggregateInterval",
+        "options": [
+          {
+            "selected": false,
+            "text": "auto",
+            "value": "$__auto_interval_AggregateInterval"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          },
+          {
+            "selected": true,
+            "text": "7d",
+            "value": "7d"
+          },
+          {
+            "selected": false,
+            "text": "14d",
+            "value": "14d"
+          },
+          {
+            "selected": false,
+            "text": "30d",
+            "value": "30d"
+          }
+        ],
+        "query": "1d,7d,14d,30d",
+        "queryValue": "",
+        "refresh": 2,
+        "skipUrlSync": false,
+        "type": "interval"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "DevOpsMetrics",
+  "uid": "EhJc6kCnz",
+  "version": 46,
+  "weekStart": ""
+}
