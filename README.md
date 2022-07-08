@@ -33,7 +33,7 @@ _optional if the Repository is public and on the regular GitHub server_
 1. Go to your account `settings > Developer settings > Personal acess tokens > Generate new token`
 2. Expiration should be `no expiration` or a new token has to be created regularly
 3. `repo` scope should be selected
-~~4. _optional_ - `admin:repo_hook` can be selected to automate next step "Create Webhook"~~
+4. ~~_optional_ - `admin:repo_hook` can be selected to automate next step "Create Webhook"~~
 
 ### Create Webhook
 
