@@ -15,16 +15,16 @@ const joi = require("joi");
  *              properties:
  *                  deploymentFrequency:
  *                      type: number
- *                      description: The mean daily amount of deployments in the past 7 days
+ *                      description: The mean amount of seconds passed between two deployments
  *                  leadTime:
  *                      type: number
- *                      description: The mean amount of seconds passed between first commit and finished deployment of a code change in the past 7 days
+ *                      description: The mean amount of seconds passed between first commit and finished deployment of a code change
  *                  changeFailRate:
  *                      type: number
- *                      description: Percentage of deployments that caused an incident in the past 7 days (between 0 and 1)
+ *                      description: Percentage of deployments that caused an incident(between 0 and 1)
  *                  timeToRecovery:
  *                      type: number
- *                      description: The mean amount of seconds passed between the happening of an incident and the issue being resolved in the past 7 days
+ *                      description: The mean amount of seconds passed between the happening of an incident and the issue being resolved
  */
 
 /**
@@ -58,7 +58,10 @@ const joi = require("joi");
 router.get("/metrics", async (req, res) => {
   try {
     const timeRange = req.query["time-range"];
-    joi.assert(timeRange, joi.string().pattern(/(\d+(mo|us|ns|ms|[smhdwy]))+/));
+    joi.assert(
+      timeRange,
+      joi.string().pattern(/(\d+(mo|[dwy]))+/, { name: "duration" })
+    );
 
     const metrics = {
       deploymentFrequency: await deploymentFrequency(timeRange),
@@ -68,6 +71,9 @@ router.get("/metrics", async (req, res) => {
     };
     res.status(200).json(metrics);
   } catch (err) {
+    if (err.name === "ValidationError") {
+      return res.status(400).send(err.annotate(true));
+    }
     console.error(err);
     res.sendStatus(500);
   }

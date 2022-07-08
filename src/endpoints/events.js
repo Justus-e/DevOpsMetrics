@@ -153,7 +153,7 @@ router.post("/events", (req, res) => {
     res.status(200).send(`Event of type '${eventType}' added!`);
   } catch (err) {
     if (err.name === "ValidationError") {
-      res.status(400).send(err.annotate(true));
+      return res.status(400).send(err.annotate(true));
     }
     console.log(err);
     res.sendStatus(500);

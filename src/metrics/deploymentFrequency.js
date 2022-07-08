@@ -7,8 +7,8 @@ const getMetric = async (timeRange = "1w") => {
       |> range(start: -${timeRange})
       |> filter(fn: (r) => r["_measurement"] == "deployment" and r["_field"] == "id")
       |> unique(column: "_value")
-      |> aggregateWindow(every: 1d, fn: count)
-      |> mean()
+      |> elapsed()
+      |> mean(column: "elapsed")
       `;
 
   const res = await influx.queryEvents(query);
@@ -17,7 +17,7 @@ const getMetric = async (timeRange = "1w") => {
     throw Error("Deployment Frequency could not be queried");
   }
 
-  return res[0]._value;
+  return res[0].elapsed;
 };
 
 module.exports = getMetric;
