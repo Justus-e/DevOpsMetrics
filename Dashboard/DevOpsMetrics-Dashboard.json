@@ -144,7 +144,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1657203993920,
+  "iteration": 1657288116246,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -166,72 +166,37 @@
         "type": "influxdb",
         "uid": "${DS_INFLUXDB-PROD}"
       },
-      "description": "Average amount of deploys per day and per week",
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 1,
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "dark-red",
+                "color": "purple",
                 "value": null
               },
               {
-                "color": "red",
-                "value": 0.25
+                "color": "green",
+                "value": 86400
               },
               {
                 "color": "#EAB839",
-                "value": 1
+                "value": 2592000
               },
               {
-                "color": "green",
-                "value": 5
+                "color": "red",
+                "value": 15552000
               }
             ]
           },
-          "unit": "deploys / week"
+          "unit": "s"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byFrameRefID",
-              "options": "B"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "deploys / day"
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "red",
-                      "value": null
-                    },
-                    {
-                      "color": "#EAB839",
-                      "value": 0.1
-                    },
-                    {
-                      "color": "green",
-                      "value": 0.8
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 6,
@@ -239,10 +204,10 @@
         "x": 0,
         "y": 1
       },
-      "id": 7,
+      "id": 24,
       "options": {
         "colorMode": "background",
-        "graphMode": "none",
+        "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
@@ -252,8 +217,7 @@
           "fields": "",
           "values": false
         },
-        "text": {},
-        "textMode": "value"
+        "textMode": "auto"
       },
       "pluginVersion": "8.5.4",
       "targets": [
@@ -262,21 +226,11 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB-PROD}"
           },
-          "query": "from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n  |> unique(column: \"_value\")\r\n  |> aggregateWindow(every: 1w, fn: count)\r\n  |> mean()",
+          "query": " from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n  |> unique(column: \"_value\")\r\n  |> elapsed()\r\n  |> mean(column: \"elapsed\")",
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB-PROD}"
-          },
-          "hide": false,
-          "query": "from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n  |> unique(column: \"_value\")\r\n  |> aggregateWindow(every: 1d, fn: count)\r\n  |> mean()",
-          "refId": "B"
         }
       ],
       "title": "Deployment Frequency",
-      "transformations": [],
       "type": "stat"
     },
     {
@@ -284,7 +238,7 @@
         "type": "influxdb",
         "uid": "${DS_INFLUXDB-PROD}"
       },
-      "description": "Average Daily amount of deploys per week in the past 30 days",
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -293,8 +247,6 @@
           "custom": {
             "axisLabel": "",
             "axisPlacement": "auto",
-            "axisSoftMax": 3,
-            "axisSoftMin": 0,
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 0,
@@ -310,7 +262,7 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "never",
+            "showPoints": "auto",
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -325,24 +277,24 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
+                "color": "purple",
                 "value": null
               },
               {
-                "color": "red",
-                "value": 0.1
-              },
-              {
-                "color": "yellow",
-                "value": 0.8
-              },
-              {
                 "color": "green",
-                "value": 2
+                "value": 86400
+              },
+              {
+                "color": "#EAB839",
+                "value": 2592000
+              },
+              {
+                "color": "red",
+                "value": 15552000
               }
             ]
           },
-          "unit": "deploys / day"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -352,7 +304,7 @@
         "x": 12,
         "y": 1
       },
-      "id": 4,
+      "id": 25,
       "options": {
         "legend": {
           "calcs": [],
@@ -364,13 +316,14 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "8.5.4",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB-PROD}"
           },
-          "query": "import \"date\"\r\n\r\nfrom(bucket: \"events\")\r\n  |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n  |> unique(column: \"_value\")\r\n  |> aggregateWindow(every: 1d, fn: count)\r\n  |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)\r\n ",
+          "query": " from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n  |> unique(column: \"_value\")\r\n  |> elapsed()\r\n  |> map(fn: (r) => ({_value: r[\"elapsed\"], _time: r[\"_time\"]}))\r\n  |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)",
           "refId": "A"
         }
       ],
@@ -405,8 +358,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "purple",
                 "value": null
+              },
+              {
+                "color": "green",
+                "value": 3600000000000
+              },
+              {
+                "color": "yellow",
+                "value": 604800000000000
+              },
+              {
+                "color": "red",
+                "value": 15552000000000000
               }
             ]
           },
@@ -422,7 +387,7 @@
       },
       "id": 6,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -484,7 +449,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "area"
             }
           },
           "mappings": [],
@@ -492,8 +457,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "purple",
                 "value": null
+              },
+              {
+                "color": "green",
+                "value": 3600000000000
+              },
+              {
+                "color": "#EAB839",
+                "value": 604800000000000
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 15552000000000000
               }
             ]
           },
@@ -573,11 +550,11 @@
                 "value": 0.2
               },
               {
-                "color": "orange",
+                "color": "dark-orange",
                 "value": 0.25
               },
               {
-                "color": "red",
+                "color": "dark-red",
                 "value": 0.3
               }
             ]
@@ -677,11 +654,11 @@
                 "value": 0.2
               },
               {
-                "color": "orange",
+                "color": "dark-orange",
                 "value": 0.25
               },
               {
-                "color": "red",
+                "color": "dark-red",
                 "value": 0.3
               }
             ]
@@ -750,8 +727,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "purple",
                 "value": null
+              },
+              {
+                "color": "green",
+                "value": 3600000000000
+              },
+              {
+                "color": "#EAB839",
+                "value": 86400000000000
+              },
+              {
+                "color": "red",
+                "value": 604800000000000
               }
             ]
           },
@@ -767,7 +756,7 @@
       },
       "id": 10,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -829,7 +818,7 @@
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "area"
             }
           },
           "mappings": [],
@@ -837,8 +826,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "purple",
                 "value": null
+              },
+              {
+                "color": "green",
+                "value": 3600000000000
+              },
+              {
+                "color": "#EAB839",
+                "value": 86400000000000
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 604800000000000
               }
             ]
           },
@@ -879,7 +880,7 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "1h",
+  "refresh": false,
   "schemaVersion": 36,
   "style": "dark",
   "tags": [],
@@ -950,6 +951,6 @@
   "timezone": "",
   "title": "DevOpsMetrics",
   "uid": "EhJc6kCnz",
-  "version": 46,
+  "version": 60,
   "weekStart": ""
 }
