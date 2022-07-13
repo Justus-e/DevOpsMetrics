@@ -132,23 +132,24 @@ const joi = require("joi");
  *          200:
  *              description: 'Event successfully added'
  */
-router.post("/events", (req, res) => {
+router.post("/events", async (req, res) => {
   try {
     joi.assert(req.body, requestSchema);
 
     const { eventType, payload } = req.body;
     switch (eventType) {
       case "deployment":
-        influx.writeDeploymentEvent(payload);
+        await influx.writeDeploymentEvent(payload);
         break;
       case "change":
         influx.writeChangeEvent(payload);
+        await influx.flush();
         break;
       case "incident":
-        influx.writeIncidentEvent(payload);
+        await influx.writeIncidentEvent(payload);
         break;
       case "restore":
-        influx.writeRestoreEvent(payload);
+        await influx.writeRestoreEvent(payload);
     }
     res.status(200).send(`Event of type '${eventType}' added!`);
   } catch (err) {

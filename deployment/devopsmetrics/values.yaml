@@ -1,0 +1,25 @@
+webapp:
+  image: justusernst/devopsmetrics
+  tag: 1.0
+  replicas: 1
+  nodePort: 30303
+  apiKey: #
+
+influxdb:
+  image: influxdb
+  tag: 2.3
+  storage: 2Gi
+  config:
+    influxUrl: http://influx-service.default.svc.cluster.local:8086
+    influxBucket: events
+  secret:
+    influxUser: #
+    influxOrg: #
+    influxPassword: #
+    influxToken: #
+
+grafana:
+  image: grafana/grafana-oss
+  tag: 9.0.2
+  nodePort: 30304
+  storage: 1Gi

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+data:
+  prometheus.yaml: |-
+    apiVersion: 1
+    datasources:
+      - name: InfluxDB
+        type: influxdb
+        access: proxy
+        url: {{ .Values.influxdb.config.influxUrl }}
+        user: {{ .Values.influxdb.secret.influxUser }}
+        isDefault: true
+        secureJsonData:
+          token: {{ .Values.influxdb.secret.influxToken }}
+          password: {{ .Values.influxdb.secret.influxPassword }}
+        jsonData:
+          version: Flux
+          organization: {{ .Values.influxdb.secret.influxOrg }}
+          defaultBucket: {{ .Values.influxdb.config.influxBucket }}

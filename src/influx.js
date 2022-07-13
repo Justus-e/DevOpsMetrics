@@ -3,6 +3,8 @@ const { InfluxDB } = require("@influxdata/influxdb-client");
 const org = process.env.INFLUX_ORG;
 const bucket = process.env.INFLUX_BUCKET;
 
+console.log(process.env.INFLUX_URL);
+
 const client = new InfluxDB({
   url: process.env.INFLUX_URL,
   token: process.env.INFLUX_TOKEN,
@@ -20,11 +22,11 @@ const writeDeploymentEvent = (deployment) => {
       .tag("repo", deployment.repo)
       .timestamp(new Date());
 
-    console.log("point", point);
+    console.log("writing point:", point);
 
     writeApi.writePoint(point);
   }
-  flush();
+  return flush();
 };
 
 /*
@@ -45,7 +47,7 @@ const writeIncidentEvent = (incident) => {
     .tag("repo", incident.repo)
     .timestamp(new Date(incident.timestamp));
   writeApi.writePoint(point);
-  flush();
+  return flush();
 };
 const writeRestoreEvent = (restore) => {
   const point = new Point("restore")
@@ -53,7 +55,7 @@ const writeRestoreEvent = (restore) => {
     .tag("repo", restore.repo)
     .timestamp(new Date(restore.timestamp));
   writeApi.writePoint(point);
-  flush();
+  return flush();
 };
 
 const queryEvents = (query) => {
@@ -75,9 +77,7 @@ const queryLastDeployEvent = () => {
 };
 
 const flush = () => {
-  writeApi.flush().catch((e) => {
-    console.error(e);
-  });
+  return writeApi.flush();
 };
 
 module.exports = {

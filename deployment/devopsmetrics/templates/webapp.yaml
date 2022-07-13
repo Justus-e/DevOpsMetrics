@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-deployment
+  labels:
+    app: webapp
+spec:
+  replicas: {{ .Values.webapp.replicas }}
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+        - name: webapp
+          image: {{ .Values.webapp.image }}:{{ .Values.webapp.tag }}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: webapp-secret
+                  key: api-key
+            - name: INFLUX_ORG
+              valueFrom:
+                secretKeyRef:
+                  name: influx-secret
+                  key: influx-org
+            - name: INFLUX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: influx-secret
+                  key: influx-token
+            - name: INFLUX_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: influx-config
+                  key: influx-bucket
+            - name: INFLUX_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: influx-config
+                  key: influx-url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+spec:
+  type: NodePort
+  selector:
+    app: webapp
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: {{ .Values.webapp.nodePort }}

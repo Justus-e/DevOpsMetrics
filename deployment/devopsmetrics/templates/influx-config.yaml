@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influx-config
+data:
+  influx-url: {{ .Values.influxdb.config.influxUrl }}
+  influx-bucket: {{ .Values.influxdb.config.influxBucket }}
