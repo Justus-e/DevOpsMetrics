@@ -3,8 +3,6 @@ const { InfluxDB } = require("@influxdata/influxdb-client");
 const org = process.env.INFLUX_ORG;
 const bucket = process.env.INFLUX_BUCKET;
 
-console.log(process.env.INFLUX_URL);
-
 const client = new InfluxDB({
   url: process.env.INFLUX_URL,
   token: process.env.INFLUX_TOKEN,
