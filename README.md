@@ -7,7 +7,7 @@ A tool to measure software delivery performance by calculating the four DORA Met
 ## Install on kubernetes
 
 1. fill missing values in values.yaml
-2. run `helm install devopsmetrics ./deployment/devopsmetrics/ --values ./deployment/devopsmetrics/values.yaml`
+2. run `helm upgrade --install devopsmetrics ./deployment/devopsmetrics/ --values ./deployment/devopsmetrics/values.yaml`
 
 chart includes influxDB instance + grafana dashboard
 

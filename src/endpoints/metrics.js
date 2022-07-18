@@ -6,6 +6,59 @@ const changeFailRate = require("../metrics/changeFailRate");
 const timeToRecovery = require("../metrics/timeToRecover");
 const joi = require("joi");
 
+/** HistoricData MODEL
+ * @swagger
+ *  components:
+ *      schemas:
+ *          HistoricData:
+ *              type: object
+ *              properties:
+ *                  deploymentFrequency:
+ *                      type: array
+ *                      items:
+ *                        type: object
+ *                        properties:
+ *                          time:
+ *                            type: date
+ *                            description: timestamp for the data
+ *                          value:
+ *                            type: number
+ *                            description: The mean amount of seconds passed between two deployments
+ *                  leadTime:
+ *                      type: array
+ *                      items:
+ *                        type: object
+ *                        properties:
+ *                          time:
+ *                            type: date
+ *                            description: timestamp for the data
+ *                          value:
+ *                            type: number
+ *                            description: The mean amount of seconds passed between first commit and finished deployment of a code change
+ *                  changeFailRate:
+ *                      type: array
+ *                      items:
+ *                        type: object
+ *                        properties:
+ *                          time:
+ *                            type: date
+ *                            description: timestamp for the data
+ *                          value:
+ *                            type: number
+ *                            description: Percentage of deployments that caused an incident(between 0 and 1)
+ *                  timeToRecovery:
+ *                      type: array
+ *                      items:
+ *                        type: object
+ *                        properties:
+ *                          time:
+ *                            type: date
+ *                            description: timestamp for the data
+ *                          value:
+ *                            type: number
+ *                            description: The mean amount of seconds passed between the happening of an incident and the issue being resolved
+ */
+
 /** Metrics MODEL
  * @swagger
  *  components:
@@ -25,6 +78,9 @@ const joi = require("joi");
  *                  timeToRecovery:
  *                      type: number
  *                      description: The mean amount of seconds passed between the happening of an incident and the issue being resolved
+ *                  historicData:
+ *                      $ref: '#/components/schemas/HistoricData'
+ *
  */
 
 /**
@@ -47,6 +103,24 @@ const joi = require("joi");
  *            type: string
  *          description: time range to take into account
  *          default: 1w
+ *        - in: query
+ *          name: include-historic
+ *          schema:
+ *            type: boolean
+ *          description: whether to include time series Data for each metric
+ *          default: false
+ *        - in: query
+ *          name: aggregate-interval
+ *          schema:
+ *            type: string
+ *          description: interval in which the data-points are being aggregated to one point.
+ *          default: 1d
+ *        - in: query
+ *          name: create-empty
+ *          schema:
+ *            type: boolean
+ *          description: whether to create a data-point for each intervall, even if there is no data
+ *          default: false
  *      responses:
  *          200:
  *              description: OK
@@ -57,18 +131,52 @@ const joi = require("joi");
  */
 router.get("/metrics", async (req, res) => {
   try {
-    const timeRange = req.query["time-range"];
+    const timeRange = req.query["time-range"] || "1w";
+    const includeHistoricData = req.query["include-historic"] || "false";
+    const aggregateInterval = req.query["aggregate-interval"] || "1d";
+    const createEmpty = req.query["create-empty"] || "false";
     joi.assert(
       timeRange,
       joi.string().pattern(/(\d+(mo|[dwy]))+/, { name: "duration" })
     );
+    joi.assert(createEmpty, joi.string().valid("true", "false"));
+    joi.assert(
+      aggregateInterval,
+      joi.string().pattern(/(\d+(mo|[dwy]))+/, { name: "duration" })
+    );
+    joi.assert(includeHistoricData, joi.string().valid("true", "false"));
 
-    const metrics = {
-      deploymentFrequency: await deploymentFrequency(timeRange),
-      leadTime: await leadTime(timeRange),
-      changeFailRate: await changeFailRate(timeRange),
-      timeToRecovery: await timeToRecovery(timeRange),
+    let metrics = {
+      deploymentFrequency: await deploymentFrequency.getMetric(timeRange),
+      leadTime: await leadTime.getMetric(timeRange),
+      changeFailRate: await changeFailRate.getMetric(timeRange),
+      timeToRecovery: await timeToRecovery.getMetric(timeRange),
     };
+
+    if (includeHistoricData === "true") {
+      metrics.historicData = {
+        deploymentFrequency: await deploymentFrequency.getMetricOverTime(
+          timeRange,
+          aggregateInterval,
+          createEmpty === "true"
+        ),
+        leadTime: await leadTime.getMetricOverTime(
+          timeRange,
+          aggregateInterval,
+          createEmpty === "true"
+        ),
+        changeFailRate: await changeFailRate.getMetricOverTime(
+          timeRange,
+          aggregateInterval
+        ),
+        timeToRecovery: await timeToRecovery.getMetricOverTime(
+          timeRange,
+          aggregateInterval,
+          createEmpty === "true"
+        ),
+      };
+    }
+
     res.status(200).json(metrics);
   } catch (err) {
     if (err.name === "ValidationError") {

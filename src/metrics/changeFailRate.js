@@ -34,10 +34,49 @@ const getMetric = async (timeRange = "1w") => {
   const res = await influx.queryEvents(query);
 
   if (res.length !== 1) {
-    throw Error("Change Fail Rate could not be queried");
+    console.warn("Change Fail Rate could not be queried");
+    return 0;
   }
 
   return res[0]._value;
 };
 
-module.exports = getMetric;
+const getMetricOverTime = async (
+  timeRange = "1w",
+  aggregateInterval = "1d"
+) => {
+  const query = `
+    import "array"
+    import "date"
+
+    incident = from(bucket: "${bucket}")
+    |> range(start: -${timeRange})
+    |> filter(fn: (r) => r["_measurement"] == "incident")
+    |> aggregateWindow(every: ${aggregateInterval}, fn: count)
+  
+    deployment = from(bucket: "${bucket}")
+    |> range(start: -${timeRange})
+    |> filter(fn: (r) => r["_measurement"] == "deployment" and r["_field"] == "id")
+    |> unique(column: "_value")
+    |> aggregateWindow(every: ${aggregateInterval}, fn: count)
+ 
+    join(
+    tables: {incident:incident, deployment:deployment},
+    on: ["_time"],
+    )
+    |> map(fn: (r) => ({ 
+    _value: 
+        if r["_value_deployment"] == 0 then 
+            float(v: 0)
+        else
+            float(v: r["_value_incident"]) / float(v: r["_value_deployment"]),
+    _time: r["_time"]
+    }))
+  `;
+
+  const res = await influx.queryEvents(query);
+  console.log(res);
+  return res.map((it) => ({ time: it._time, value: it._value }));
+};
+
+module.exports = { getMetric, getMetricOverTime };
