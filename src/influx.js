@@ -1,7 +1,8 @@
 const { InfluxDB } = require("@influxdata/influxdb-client");
 
 const org = process.env.INFLUX_ORG;
-const bucket = process.env.INFLUX_BUCKET;
+const bucket =
+  process.env.TEST_MODE === "true" ? "events-test" : process.env.INFLUX_BUCKET;
 
 const client = new InfluxDB({
   url: process.env.INFLUX_URL,
@@ -13,14 +14,16 @@ const writeApi = client.getWriteApi(org, bucket);
 const queryApi = client.getQueryApi(org);
 
 const writeDeploymentEvent = (deployment) => {
+  const timestamp = deployment.timestamp
+    ? new Date(deployment.timestamp)
+    : new Date();
   for (const change of deployment.changes) {
+    timestamp.setTime(timestamp.getTime() + 1);
     const point = new Point("deployment")
       .stringField("id", deployment.id)
       .stringField("change", change)
       .tag("repo", deployment.repo)
-      .timestamp(new Date());
-
-    console.log("writing point:", point);
+      .timestamp(new Date(timestamp));
 
     writeApi.writePoint(point);
   }
@@ -78,6 +81,34 @@ const flush = () => {
   return writeApi.flush();
 };
 
+const createTestBucket = async () => {
+  const axios = require("axios");
+  const res = await axios.get(
+    `${process.env.INFLUX_URL}/api/v2/orgs?org=${org}`,
+    {
+      headers: {
+        Authorization: `Token ${process.env.INFLUX_TOKEN}`,
+      },
+    }
+  );
+
+  const orgId = res.data.orgs[0].id;
+  return axios.post(
+    `${process.env.INFLUX_URL}/api/v2/buckets`,
+    {
+      orgId: orgId,
+      name: "events-test",
+      retentionRules: [{ everySeconds: 0, type: "expire" }],
+    },
+    {
+      headers: {
+        Authorization: `Token ${process.env.INFLUX_TOKEN}`,
+        "Content-type": "application/json",
+      },
+    }
+  );
+};
+
 module.exports = {
   writeDeploymentEvent,
   writeChangeEvent,
@@ -86,4 +117,5 @@ module.exports = {
   flush,
   queryEvents,
   queryLastDeployEvent,
+  createTestBucket,
 };

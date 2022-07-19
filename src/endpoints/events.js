@@ -43,6 +43,11 @@ const joi = require("joi");
  *           example: ["dd05f3119a18f53d1e782384b8f47751479de472", "79e10eec267bf99ec5a67acb28bc24b0eca1977a", "13fcc20de75badd00c2e1c94423a97383a4f2137"]
  *           required: true
  *           description: SHAs of all commits after last deployment commit until now
+ *         timestamp:
+ *           type: string
+ *           required: false
+ *           description: timestamp which should be used in calculation for this deployment (if omitted current DateTime will be used)
+ *           example: "2021-01-25T13:55:52Z"
  *         repo:
  *           type: string
  *           required: true
@@ -174,6 +179,7 @@ const requestSchema = joi.object({
           id: joi.string().required(),
           repo: joi.string().required(),
           changes: joi.array().items(joi.string()).required(),
+          timestamp: joi.date().optional(),
         }),
       },
       {
