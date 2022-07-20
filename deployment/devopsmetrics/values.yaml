@@ -1,9 +1,10 @@
 webapp:
   image: justusernst/devopsmetrics
-  tag: 1.0
+  tag: "1.0"
   replicas: 1
   nodePort: 30303
   apiKey: #
+  testMode: #
 
 influxdb:
   image: influxdb

@@ -45,6 +45,8 @@ spec:
                 configMapKeyRef:
                   name: influx-config
                   key: influx-url
+            - name: TEST_MODE
+              value: "{{ .Values.webapp.testMode}}"
 ---
 apiVersion: v1
 kind: Service

@@ -28,7 +28,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "8.5.4"
+      "version": "9.0.2"
     },
     {
       "type": "datasource",
@@ -99,7 +99,7 @@
         },
         "name": "deployments",
         "target": {
-          "query": "from(bucket: \"events\")\r\n|> range(start: ${__from:date}, stop: ${__to:date})\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n|> unique(column: \"_value\")",
+          "query": "from(bucket: \"${bucket}\")\r\n|> range(start: ${__from:date}, stop: ${__to:date})\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n|> unique(column: \"_value\")",
           "refId": "Anno"
         }
       },
@@ -126,7 +126,7 @@
         },
         "name": "incidents",
         "target": {
-          "query": "from(bucket: \"events\")\r\n|> range(start: ${__from:date}, stop: ${__to:date})\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n|> unique(column: \"_value\")",
+          "query": "from(bucket: \"${bucket}\")\r\n|> range(start: ${__from:date}, stop: ${__to:date})\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n|> unique(column: \"_value\")",
           "refId": "Anno"
         }
       },
@@ -153,7 +153,7 @@
         },
         "name": "changes",
         "target": {
-          "query": "from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"change\")",
+          "query": "from(bucket: \"${bucket}\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"change\")",
           "refId": "Anno"
         }
       },
@@ -176,7 +176,7 @@
         },
         "name": "restore",
         "target": {
-          "query": " from(bucket: \"events\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"restore\")\r\n  |> map(fn: (r) => ({restore:  r[\"_value\"], _time: r[\"_time\"]}))",
+          "query": " from(bucket: \"${bucket}\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"restore\")\r\n  |> map(fn: (r) => ({restore:  r[\"_value\"], _time: r[\"_time\"]}))",
           "refId": "Anno"
         }
       }
@@ -186,7 +186,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1658218060025,
+  "iteration": 1658259770513,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -261,7 +261,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.4",
+      "pluginVersion": "9.0.2",
       "targets": [
         {
           "datasource": {
@@ -365,7 +365,7 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "from(bucket: \"${bucket}\")\r\n  |> range(start: ${__from:date}, stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n  |> unique(column: \"_value\")\r\n  |> elapsed()\r\n  |> map(fn: (r) => ({_value: r[\"elapsed\"], _time: r[\"_time\"]}))\r\n  |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)",
+          "query": "import \"date\"\r\nfrom(bucket: \"${bucket}\")\r\n  |> range(start: date.sub(from:${__from:date},d: ${AggregateInterval}), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n  |> unique(column: \"_value\")\r\n  |> elapsed()\r\n  |> map(fn: (r) => ({_value: r[\"elapsed\"], _time: r[\"_time\"]}))\r\n  |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)",
           "refId": "A"
         }
       ],
@@ -442,7 +442,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.4",
+      "pluginVersion": "9.0.2",
       "targets": [
         {
           "datasource": {
@@ -545,7 +545,7 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "import \"date\"\r\n\r\ndeploys = from(bucket: \"${bucket}\")\r\n  |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"change\")\r\n\r\nchanges = from(bucket: \"${bucket}\")\r\n  |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"change\" and r[\"_field\"] == \"id\")\r\n\r\njoin(\r\n    tables: {change:changes, deploy:deploys},\r\n    on: [\"_value\"],\r\n)\r\n  |> map(fn: (r) => ({_value: uint(v: r[\"_time_deploy\"]) - uint(v: r[\"_time_change\"]), _time: r[\"_time_deploy\"]}))\r\n  |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)\r\n",
+          "query": "import \"date\"\r\n\r\ndeploys = from(bucket: \"${bucket}\")\r\n  |> range(start: date.sub(from:${__from:date}, d: ${AggregateInterval}), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"change\")\r\n\r\nchanges = from(bucket: \"${bucket}\")\r\n  |> range(start: date.sub(from:${__from:date}, d: ${AggregateInterval}), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"change\" and r[\"_field\"] == \"id\")\r\n\r\njoin(\r\n    tables: {change:changes, deploy:deploys},\r\n    on: [\"_value\"],\r\n)\r\n  |> map(fn: (r) => ({_value: uint(v: r[\"_time_deploy\"]) - uint(v: r[\"_time_change\"]), _time: r[\"_time_deploy\"]}))\r\n  |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)\r\n",
           "refId": "A"
         }
       ],
@@ -626,7 +626,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.4",
+      "pluginVersion": "9.0.2",
       "targets": [
         {
           "datasource": {
@@ -734,7 +734,7 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "import \"array\"\r\nimport \"date\"\r\n\r\nincident = from(bucket: \"${bucket}\")\r\n    |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n    |> aggregateWindow(every: ${AggregateInterval}, fn: count)\r\n  \r\ndeployment = from(bucket: \"${bucket}\")\r\n    |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n    |> unique(column: \"_value\")\r\n    |> aggregateWindow(every: ${AggregateInterval}, fn: count)\r\n \r\njoin(\r\n    tables: {incident:incident, deployment:deployment},\r\n    on: [\"_time\"],\r\n)\r\n    |> map(fn: (r) => ({ \r\n    _value: \r\n        if r[\"_value_deployment\"] == 0 then \r\n            float(v: 0)\r\n        else\r\n            float(v: r[\"_value_incident\"]) / float(v: r[\"_value_deployment\"]),\r\n    _time: r[\"_time\"]\r\n    }))",
+          "query": "import \"array\"\r\nimport \"date\"\r\n\r\nincident = from(bucket: \"${bucket}\")\r\n    |> range(start: date.sub(from:${__from:date}, d: ${AggregateInterval}), stop: ${__to:date})\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n    |> aggregateWindow(every: ${AggregateInterval}, fn: count)\r\n  \r\ndeployment = from(bucket: \"${bucket}\")\r\n    |> range(start: date.sub(from:${__from:date}, d: ${AggregateInterval}), stop: ${__to:date})\r\n    |> filter(fn: (r) => r[\"_measurement\"] == \"deployment\" and r[\"_field\"] == \"id\")\r\n    |> unique(column: \"_value\")\r\n    |> aggregateWindow(every: ${AggregateInterval}, fn: count)\r\n \r\njoin(\r\n    tables: {incident:incident, deployment:deployment},\r\n    on: [\"_time\"],\r\n)\r\n    |> map(fn: (r) => ({ \r\n    _value: \r\n        if r[\"_value_deployment\"] == 0 then \r\n            float(v: 0)\r\n        else\r\n            float(v: r[\"_value_incident\"]) / float(v: r[\"_value_deployment\"]),\r\n    _time: r[\"_time\"]\r\n    }))",
           "refId": "A"
         }
       ],
@@ -811,7 +811,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.4",
+      "pluginVersion": "9.0.2",
       "targets": [
         {
           "datasource": {
@@ -914,7 +914,7 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "import \"date\"\r\n\r\nincident = from(bucket: \"${bucket}\")\r\n  |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n\r\nrestore = from(bucket: \"${bucket}\")\r\n  |> range(start: date.sub(from:${__from:date}, d: 7d), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"restore\")\r\n\r\njoin(\r\n        tables: {incident:incident, restore:restore},\r\n        on: [\"_value\"],\r\n    )\r\n    |> map(fn: (r) => ({_value: uint(v: r[\"_time_restore\"]) - uint(v: r[\"_time_incident\"]), _time: r[\"_time_incident\"]}))\r\n    |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)",
+          "query": "import \"date\"\r\n\r\nincident = from(bucket: \"${bucket}\")\r\n  |> range(start: date.sub(from:${__from:date}, d: ${AggregateInterval}), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"incident\")\r\n\r\nrestore = from(bucket: \"${bucket}\")\r\n  |> range(start: date.sub(from:${__from:date}, d: ${AggregateInterval}), stop: ${__to:date})\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"restore\")\r\n\r\njoin(\r\n        tables: {incident:incident, restore:restore},\r\n        on: [\"_value\"],\r\n    )\r\n    |> map(fn: (r) => ({_value: uint(v: r[\"_time_restore\"]) - uint(v: r[\"_time_incident\"]), _time: r[\"_time_incident\"]}))\r\n    |> aggregateWindow(every: ${AggregateInterval}, fn: mean, createEmpty: false)",
           "refId": "A"
         }
       ],
@@ -980,7 +980,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "8.5.4",
+      "pluginVersion": "9.0.2",
       "targets": [
         {
           "datasource": {
@@ -1139,7 +1139,7 @@
         },
         "showUnfilled": true
       },
-      "pluginVersion": "8.5.4",
+      "pluginVersion": "9.0.2",
       "targets": [
         {
           "datasource": {
@@ -1181,7 +1181,7 @@
       "type": "bargauge"
     }
   ],
-  "refresh": "",
+  "refresh": false,
   "schemaVersion": 36,
   "style": "dark",
   "tags": [],
@@ -1192,7 +1192,7 @@
         "auto_count": 20,
         "auto_min": "1d",
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "7d",
           "value": "7d"
         },
@@ -1272,6 +1272,6 @@
   "timezone": "",
   "title": "DevOpsMetrics",
   "uid": "EhJc6kCnz",
-  "version": 74,
+  "version": 3,
   "weekStart": ""
 }
