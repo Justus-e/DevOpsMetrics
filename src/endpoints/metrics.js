@@ -19,7 +19,7 @@ const joi = require("joi");
  *                        type: object
  *                        properties:
  *                          time:
- *                            type: date
+ *                            type: string
  *                            description: timestamp for the data
  *                          value:
  *                            type: number
@@ -30,7 +30,7 @@ const joi = require("joi");
  *                        type: object
  *                        properties:
  *                          time:
- *                            type: date
+ *                            type: string
  *                            description: timestamp for the data
  *                          value:
  *                            type: number
@@ -41,7 +41,7 @@ const joi = require("joi");
  *                        type: object
  *                        properties:
  *                          time:
- *                            type: date
+ *                            type: string
  *                            description: timestamp for the data
  *                          value:
  *                            type: number
@@ -52,7 +52,7 @@ const joi = require("joi");
  *                        type: object
  *                        properties:
  *                          time:
- *                            type: date
+ *                            type: string
  *                            description: timestamp for the data
  *                          value:
  *                            type: number
