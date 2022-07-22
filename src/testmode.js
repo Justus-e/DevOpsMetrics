@@ -29,7 +29,7 @@ influx
     console.log("Test Data Created in Bucket: 'events-test'");
   })
   .catch((err) => {
-    if (err.response.status === 422) {
+    if (err.response && err.response.status === 422) {
       console.warn("Test Bucket already exists");
     } else {
       throw err;

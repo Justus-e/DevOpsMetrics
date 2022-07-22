@@ -135,6 +135,7 @@ router.get("/metrics", async (req, res) => {
     const includeHistoricData = req.query["include-historic"] || "false";
     const aggregateInterval = req.query["aggregate-interval"] || "1d";
     const createEmpty = req.query["create-empty"] || "false";
+
     joi.assert(
       timeRange,
       joi.string().pattern(/(\d+(mo|[dwy]))+/, { name: "duration" })
