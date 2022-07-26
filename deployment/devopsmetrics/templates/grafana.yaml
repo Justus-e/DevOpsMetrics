@@ -7,6 +7,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: cinder
   resources:
     requests:
       storage: {{ .Values.grafana.storage }}
@@ -14,7 +15,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: grafana-deployment
+  name: {{ template "devopsmetrics.fullname" . }}-grafana
   labels:
     app: grafana
 spec:
@@ -27,6 +28,10 @@ spec:
       labels:
         app: grafana
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 472
+        fsGroup: 472
       containers:
         - name: grafana
           image: {{ .Values.grafana.image }}:{{ .Values.grafana.tag }}
@@ -50,13 +55,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: grafana-service
+  name: {{ template "devopsmetrics.fullname" . }}-grafana
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: grafana
   ports:
     - protocol: TCP
       port: 3000
       targetPort: 3000
-      nodePort: {{ .Values.grafana.nodePort }}
+      #nodePort: {{ .Values.grafana.nodePort }}
