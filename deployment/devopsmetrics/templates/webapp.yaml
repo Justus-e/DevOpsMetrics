@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webapp-deployment
+  name: {{ template "devopsmetrics.fullname" . }}
   labels:
     app: webapp
 spec:
@@ -14,9 +14,13 @@ spec:
       labels:
         app: webapp
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
       containers:
         - name: webapp
           image: {{ .Values.webapp.image }}:{{ .Values.webapp.tag }}
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           env:
@@ -47,17 +51,30 @@ spec:
                   key: influx-url
             - name: TEST_MODE
               value: "{{ .Values.webapp.testMode}}"
+            - name: GITHUB_URL
+              value: "{{ .Values.webapp.githubUrl}}"
+            - name: GITHUB_OAUTH
+              valueFrom:
+                secretKeyRef:
+                  name: webapp-secret
+                  key: github-oauth
+            - name: GITHUB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: webapp-secret
+                  key: github-user
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp-service
+  name: {{ template "devopsmetrics.fullname" . }}
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: webapp
   ports:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-      nodePort: {{ .Values.webapp.nodePort }}
+      #nodePort: {{ .Values.webapp.nodePort }}

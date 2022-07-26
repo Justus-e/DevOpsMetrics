@@ -1,26 +1,61 @@
 webapp:
-  image: justusernst/devopsmetrics
-  tag: "1.0"
+  image: registry.app.corpintra.net/simsearch/devopsmetrics
+
+  tag: latest
   replicas: 1
   nodePort: 30303
-  apiKey: #
+  
+  apiKey: ?
   testMode: #
 
+  githubUrl: ?
+  githubOAuth: ?
+  githubUser: ?
+
+
+
 influxdb:
-  image: influxdb
+  image: registry.app.corpintra.net/dockerhub/library/influxdb
   tag: 2.3
   storage: 2Gi
   config:
     influxUrl: http://influx-service.default.svc.cluster.local:8086
     influxBucket: events
   secret:
-    influxUser: #
-    influxOrg: #
-    influxPassword: #
-    influxToken: #
+    influxUser:  #
+    influxOrg:  #
+    influxPassword:  #
+    influxToken:  #
 
 grafana:
-  image: grafana/grafana-oss
+  image: registry.app.corpintra.net/dockerhub/grafana/grafana-oss
   tag: 9.0.2
   nodePort: 30304
   storage: 1Gi
+
+  service:
+    port: 3000
+
+  ingress:
+    hosts:
+    - host: lightning-53-7-36-234.ndc-prod1.dhc.corpintra.net
+      paths:
+        - /devopsmetrics/grafana
+
+networkpolicy:
+  enabled: true
+
+service:
+  port: 8080
+
+ingress:
+  enabled: true
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/cluster-issuer: daimler-acme
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    kubernetes.io/ingress.class: traefik-v2
+  hosts:
+    - host: lightning-53-7-36-234.ndc-prod1.dhc.corpintra.net
+      paths:
+        - /devopsmetrics/app

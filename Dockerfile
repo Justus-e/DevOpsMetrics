@@ -1,4 +1,5 @@
-FROM node:lts-alpine
+FROM registry.app.corpintra.net/dockerhub/library/node:lts-alpine
+
 
 WORKDIR /usr/src/app
 

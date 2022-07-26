@@ -1,0 +1,32 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "devopsmetrics.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "devopsmetrics.labels" . | nindent 4 }}
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/cluster-issuer: daimler-acme
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    kubernetes.io/ingress.class: traefik-v2
+    traefik.ingress.kubernetes.io/router.middlewares: {{ .Release.Namespace }}-{{ template "devopsmetrics.fullname" . }}-stripprefix@kubernetescrd
+spec:
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ . }}
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $svcPort  }}
+          {{- end }}
+    {{- end }}
+{{- end }}
