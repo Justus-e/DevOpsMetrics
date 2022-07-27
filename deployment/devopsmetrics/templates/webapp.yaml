@@ -25,6 +25,21 @@ spec:
                 secretKeyRef:
                   name: webapp-secret
                   key: api-key
+            - name: GITHUB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: webapp-secret
+                  key: gh-user
+            - name: GITHUB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: webapp-secret
+                  key: gh-url
+            - name: GITHUB_OAUTH
+              valueFrom:
+                secretKeyRef:
+                  name: webapp-secret
+                  key: gh-oauth
             - name: INFLUX_ORG
               valueFrom:
                 secretKeyRef:

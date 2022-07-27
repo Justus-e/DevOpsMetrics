@@ -5,6 +5,9 @@ webapp:
   nodePort: 30303
   apiKey: #
   testMode: #
+  gitHubUser: #
+  gitHubUrl: #
+  gitHubOauth: #
 
 influxdb:
   image: influxdb

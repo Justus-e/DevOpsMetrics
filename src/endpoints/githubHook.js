@@ -33,6 +33,8 @@ router.post("/github-hook", async (req, res) => {
 
 const evaluateEvent = async (eventType, payload) => {
   switch (eventType) {
+    case "ping":
+      return Promise.resolve();
     case "push":
       return evaluatePushEvent(payload);
     case "deployment_status":
