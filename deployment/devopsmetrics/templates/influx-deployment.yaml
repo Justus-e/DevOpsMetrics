@@ -17,10 +17,6 @@ spec:
         {{- include "devopsmetrics.labels" . | nindent 8 }}
         app.kubernetes.io/component: database
     spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        fsGroup: 1000
       volumes:
         - name: influx-storage
           persistentVolumeClaim:
