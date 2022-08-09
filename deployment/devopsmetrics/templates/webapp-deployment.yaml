@@ -1,18 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "devopsmetrics.fullname" . }}
   labels:
-    app: webapp
+    {{- include "devopsmetrics.labels" . | nindent 4 }}
+    app.kubernetes.io/component: webapp
+  name: {{ template "devopsmetrics.fullname" . }}-webapp
 spec:
   replicas: {{ .Values.webapp.replicas }}
   selector:
     matchLabels:
-      app: webapp
+      {{- include "devopsmetrics.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: webapp
   template:
     metadata:
       labels:
-        app: webapp
+        {{- include "devopsmetrics.labels" . | nindent 8 }}
+        app.kubernetes.io/component: webapp
     spec:
       securityContext:
         runAsNonRoot: true
@@ -22,32 +25,32 @@ spec:
           image: {{ .Values.webapp.image }}:{{ .Values.webapp.tag }}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - containerPort: {{ .Values.webapp.service.port }}
           env:
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: webapp-secret
+                  name: {{ template "devopsmetrics.fullname" . }}-webapp
                   key: api-key
             - name: INFLUX_ORG
               valueFrom:
                 secretKeyRef:
-                  name: influx-secret
+                  name: {{ template "devopsmetrics.fullname" . }}-influx
                   key: influx-org
             - name: INFLUX_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: influx-secret
+                  name: {{ template "devopsmetrics.fullname" . }}-influx
                   key: influx-token
             - name: INFLUX_BUCKET
               valueFrom:
                 configMapKeyRef:
-                  name: influx-config
+                  name: {{ template "devopsmetrics.fullname" . }}-influx
                   key: influx-bucket
             - name: INFLUX_URL
               valueFrom:
                 configMapKeyRef:
-                  name: influx-config
+                  name: {{ template "devopsmetrics.fullname" . }}-influx
                   key: influx-url
             - name: TEST_MODE
               value: "{{ .Values.webapp.testMode}}"
@@ -56,25 +59,10 @@ spec:
             - name: GITHUB_OAUTH
               valueFrom:
                 secretKeyRef:
-                  name: webapp-secret
+                  name: {{ template "devopsmetrics.fullname" . }}-webapp
                   key: github-oauth
             - name: GITHUB_USER
               valueFrom:
                 secretKeyRef:
-                  name: webapp-secret
+                  name: {{ template "devopsmetrics.fullname" . }}-webapp
                   key: github-user
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ template "devopsmetrics.fullname" . }}
-spec:
-  type: ClusterIP
-  selector:
-    app: webapp
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
-      #nodePort: {{ .Values.webapp.nodePort }}

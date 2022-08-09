@@ -2,17 +2,16 @@
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
+  name: {{ template "devopsmetrics.fullname" . }}-influx
   labels:
     {{- include "devopsmetrics.labels" . | nindent 4 }}
-    app.kubernetes.io/component: dashboard
-  name: {{ template "devopsmetrics.fullname" . }}-grafana
+    app.kubernetes.io/component: database
 spec:
   ingress:
     - ports:
-        - port: {{ .Values.grafana.service.port }}
+        - port: {{ .Values.influxdb.service.port }}
           protocol: TCP
   podSelector:
     matchLabels:
-      {{- include "devopsmetrics.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: dashboard
+      app.kubernetes.io/component: database
 {{- end }}

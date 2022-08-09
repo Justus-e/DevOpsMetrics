@@ -1,7 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: grafana-datasources
+  labels:
+    {{- include "devopsmetrics.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dashboard
+  name: {{ template "devopsmetrics.fullname" . }}-grafana
 data:
   prometheus.yaml: |-
     apiVersion: 1

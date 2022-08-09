@@ -1,39 +1,30 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app: influx
-  name: influx-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: {{ .Values.influxdb.storage }}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: influx-deployment
+  name: {{ template "devopsmetrics.fullname" . }}-influx
   labels:
-    app: influx
+    {{- include "devopsmetrics.labels" . | nindent 4 }}
+    app.kubernetes.io/component: database
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: influx
+      {{- include "devopsmetrics.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: database
   template:
     metadata:
       labels:
-        app: influx
+        {{- include "devopsmetrics.labels" . | nindent 8 }}
+        app.kubernetes.io/component: database
     spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
+        fsGroup: 1000
       volumes:
         - name: influx-storage
           persistentVolumeClaim:
-            claimName: influx-pvc
+            claimName: {{ template "devopsmetrics.fullname" . }}-influx
       containers:
         - name: influx
           image: {{ .Values.influxdb.image }}:{{ .Values.influxdb.tag }}
@@ -48,37 +39,26 @@ spec:
             - name: DOCKER_INFLUXDB_INIT_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: influx-secret
+                  name: {{ template "devopsmetrics.fullname" . }}-influx
                   key: influx-user
             - name: DOCKER_INFLUXDB_INIT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: influx-secret
+                  name: {{ template "devopsmetrics.fullname" . }}-influx
                   key: influx-password
             - name: DOCKER_INFLUXDB_INIT_ORG
               valueFrom:
                 secretKeyRef:
-                  name: influx-secret
+                  name: {{ template "devopsmetrics.fullname" . }}-influx
                   key: influx-org
             - name: DOCKER_INFLUXDB_INIT_BUCKET
               valueFrom:
                 configMapKeyRef:
-                  name: influx-config
+                  name: {{ template "devopsmetrics.fullname" . }}-influx
                   key: influx-bucket
             - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: influx-secret
+                  name: {{ template "devopsmetrics.fullname" . }}-influx
                   key: influx-token
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: influx-service
-spec:
-  selector:
-    app: influx
-  ports:
-    - protocol: TCP
-      port: 8086
-      targetPort: 8086
+

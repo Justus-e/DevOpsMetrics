@@ -1,0 +1,25 @@
+webapp:
+  service:
+    type: ClusterIP
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: lightning-53-137-144-158.con-05.emea.dc.corpintra.net
+        paths:
+          - /devopsmetrics/app
+
+influxdb:
+  service:
+    type: ClusterIP
+
+grafana:
+  service:
+    type: ClusterIP
+
+  ingress:
+    enabled: true
+    hosts:
+    - host: lightning-53-137-144-158.con-05.emea.dc.corpintra.net
+      paths:
+        - /devopsmetrics/grafana

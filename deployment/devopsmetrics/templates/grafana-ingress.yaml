@@ -1,4 +1,4 @@
-{{- if .Values.ingress.enabled -}}
+{{- if .Values.grafana.ingress.enabled -}}
 {{- $fullName := include "devopsmetrics.fullname" . -}}
 {{- $svcPort := .Values.grafana.service.port -}}
 apiVersion: networking.k8s.io/v1
@@ -8,9 +8,8 @@ metadata:
   labels:
     {{- include "devopsmetrics.labels" . | nindent 4 }}
   annotations:
-    acme.cert-manager.io/http01-edit-in-place: "true"
     cert-manager.io/cluster-issuer: daimler-acme
-    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     kubernetes.io/ingress.class: traefik-v2
     traefik.ingress.kubernetes.io/router.middlewares: {{ .Release.Namespace }}-{{ template "devopsmetrics.fullname" . }}-grafana-stripprefix@kubernetescrd
 spec:

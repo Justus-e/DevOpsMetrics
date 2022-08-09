@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "devopsmetrics.fullname" . }}-influx
+  labels:
+    {{- include "devopsmetrics.labels" . | nindent 4 }}
+    app.kubernetes.io/component: database
+spec:
+  type: {{ .Values.influxdb.service.type }}
+  selector:
+    {{- include "devopsmetrics.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: database
+  ports:
+  - protocol: TCP
+    port: {{ .Values.influxdb.service.port }}
+    targetPort: {{ .Values.influxdb.service.port }}
+    {{if eq .Values.influxdb.service.type "NodePort"}}
+    nodePort: {{ .Values.influxdb.service.nodePort }}
+    {{end}}

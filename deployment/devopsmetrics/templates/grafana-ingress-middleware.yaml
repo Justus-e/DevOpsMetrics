@@ -1,5 +1,5 @@
-{{- if .Values.ingress.enabled -}}
-{{- $ingressPaths := .Values.ingress.paths -}}
+{{- if .Values.grafana.ingress.enabled -}}
+{{- $ingressPaths := .Values.grafana.ingress.paths -}}
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:

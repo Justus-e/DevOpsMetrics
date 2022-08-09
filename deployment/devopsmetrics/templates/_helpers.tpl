@@ -34,12 +34,23 @@ Create chart name and version as used by the chart label.
 {{/*
 Common labels
 */}}
-{{- define "devopsmetrics.labels" -}}
-app.kubernetes.io/name: {{ include "devopsmetrics.name" . }}
+{{- define "devopsmetrics.labels" }}
 helm.sh/chart: {{ include "devopsmetrics.chart" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{ include "devopsmetrics.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
+{{- with .Values.labels }}
+{{ toYaml . }}
+{{- end }}
+
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "devopsmetrics.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "devopsmetrics.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

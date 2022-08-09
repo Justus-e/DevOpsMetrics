@@ -1,32 +1,23 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app: grafana
-  name: grafana-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: cinder
-  resources:
-    requests:
-      storage: {{ .Values.grafana.storage }}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "devopsmetrics.fullname" . }}-grafana
   labels:
-    app: grafana
+    {{- include "devopsmetrics.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dashboard
 spec:
   replicas: 1
+  strategy: 
+    type: Recreate
   selector:
     matchLabels:
-      app: grafana
+      {{- include "devopsmetrics.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: dashboard
   template:
     metadata:
       labels:
-        app: grafana
+        {{- include "devopsmetrics.labels" . | nindent 8 }}
+        app.kubernetes.io/component: dashboard
     spec:
       securityContext:
         runAsNonRoot: true
@@ -36,32 +27,22 @@ spec:
         - name: grafana
           image: {{ .Values.grafana.image }}:{{ .Values.grafana.tag }}
           ports:
-            - containerPort: 3000
+            - containerPort: {{ .Values.grafana.service.port }}
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-storage
             - mountPath: /etc/grafana/provisioning/datasources
               name: grafana-datasources
               readOnly: false
+          env:
+          - name: GF_SERVER_ROOT_URL
+            value: https://lightning-53-137-144-158.con-05.emea.dc.corpintra.net/devopsmetrcs/grafana
       volumes:
         - name: grafana-storage
           persistentVolumeClaim:
-            claimName: grafana-pvc
+            claimName: {{ template "devopsmetrics.fullname" . }}-grafana
         - name: grafana-datasources
           configMap:
             defaultMode: 420
-            name: grafana-datasources
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ template "devopsmetrics.fullname" . }}-grafana
-spec:
-  type: ClusterIP
-  selector:
-    app: grafana
-  ports:
-    - protocol: TCP
-      port: 3000
-      targetPort: 3000
-      #nodePort: {{ .Values.grafana.nodePort }}
+            name: {{ template "devopsmetrics.fullname" . }}-grafana
+
