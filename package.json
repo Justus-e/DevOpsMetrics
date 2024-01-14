@@ -40,6 +40,6 @@
     "nodemon": "2.0.19",
     "prettier": "2.7.1",
     "superagent": "8.0.0",
-    "supertest": "6.2.4"
+    "supertest": "6.3.4"
   }
 }
